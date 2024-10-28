@@ -1,6 +1,3 @@
-# restaurant_project
-
-
 
 # 🍽️ Restaurant Management System
 
