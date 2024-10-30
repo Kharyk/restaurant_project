@@ -1,22 +1,8 @@
 from django.db import models
-
-#client, admin
 from django.contrib.auth.models import User
+from django.db.models import Sum, F
 
-
-class Admin(models.Model):
-    first_name = models.CharField(max_length=50)
-    famely_name = models.CharField( max_length=50)
-    bday = models.DateField()
-    start_of_work = models.DateField()
-    email = models.EmailField(max_length=254)
-    phone = models.CharField(max_length=20)
-    medical_book = models.FileField(upload_to= "med_book/", max_length=100)
-    
-
-#dish, table
 class Dish(models.Model):
-    
     SORTDT = [
         ("Breakfast", "breakfast"),
         ("Lunch", "lunch"),
@@ -28,7 +14,7 @@ class Dish(models.Model):
         ("Main Courses", "main"),
         ("Side Dishes", "side"),
         ("Desserts", "desserts"),
-        ("Beverages", "deverages"),
+        ("Beverages", "beverages"),
         ("Soups", "soups"),
         ("Salads", "salads")
     ]
@@ -36,65 +22,135 @@ class Dish(models.Model):
     name = models.CharField(max_length=255)
     ingredients = models.TextField()
     gram = models.CharField(max_length=255)
-    sort_daytime = models.CharField(max_length=15, choices=SORTDT, blank= True, null= True)
+    sort_daytime = models.CharField(max_length=15, choices=SORTDT, blank=True, null=True)
     sort = models.CharField(max_length=50, choices=SORT)
     
+
 class Table(models.Model):
     
     ZONE = [
         ("Indoors", "indoors"),        
         ("Outdoors", "outdoors")
-
     ]
     
     SORT = [
         ("PIV", "piv"),
         ("General", "general"),
         ("Appointment", "appointment")
-
     ]
     
-    name = models.IntegerField()
-    number_of_people = models.FloatField()
-    zone = models.CharField(max_length=10, choices = ZONE)
-    sort = models.CharField(max_length=20, choices = SORT)
-
+    name = models.CharField(max_length=255)
+    number_of_people = models.IntegerField()
+    zone = models.CharField(max_length=10, choices=ZONE)
+    sort = models.CharField(max_length=20, choices=SORT)
     
-#prices for dishes and tables
+
 class DishPrice(models.Model):
-    dish = models.ManyToManyField("Dish")
-    price = models.FloatField()
+    dish = models.ForeignKey(Dish, on_delete=models.CASCADE)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateTimeField(auto_now_add=False)
     
+
 class TablePrice(models.Model):
-    table = models.ManyToManyField("Table")
-    price = models.FloatField()
-    date = models.DateTimeField(("table_date_time"), auto_now_add=False)
+    table = models.ForeignKey(Table, on_delete=models.CASCADE)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateTimeField(auto_now_add=False)
+    
+
+class Comment(models.Model):
+    
+    id_client = models.ForeignKey(User, on_delete=models.CASCADE)
+    id_dish = models.ForeignKey(Dish, on_delete=models.CASCADE)
+    text = models.TextField()
+    date = models.DateTimeField(auto_now_add=True) 
     
     
-#comment
+class Stars(models.Model):
+    
+    STARS = [
+        ("One", "one"),        
+        ("Two", "two"),
+        ("Three", "three"),
+        ("Four", "four"),
+        ("Five", "five")
+    ]
+    
+    id_dish = models.ForeignKey(Dish, on_delete=models.CASCADE)
+    stars = models.CharField(max_length=5, choices=STARS)  
+    date = models.DateTimeField(auto_now_add=True) 
 
-#order
-
-#check
-
-# extra: discounts
 
 
+class Order(models.Model):
+    
+    STATUS = [
+        ("Reserved", "done"),
+        ("In the basket", "not_done")
+    ]
+    
+    id_client = models.ForeignKey(User, on_delete=models.CASCADE)
+    id_dishes = models.ManyToManyField(Dish)
+    id_table = models.ManyToManyField(Table)
+    number = models.IntegerField()
+    date = models.DateTimeField(auto_now_add=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  
+    status = models.CharField(max_length=20, choices=STATUS, default="not_done")
 
+    def calculate_price(self):
+        
+        total = 0
+        
+        for dish in self.id_dishes.all():
+            latest_price = DishPrice.objects.filter(dish=dish, date__lte=self.date).order_by('-date').first()
+            if latest_price:
+                total += latest_price.price * self.number     
+             
+        return total
 
+    def save(self, *args, **kwargs):
+        
+        self.total_price = self.calculate_price()
+        super(Order, self).save(*args, **kwargs)
 
+    
 
+class Check(models.Model):
+    id_client = models.ForeignKey(User, on_delete=models.CASCADE)
+    id_table = models.ForeignKey(Table, on_delete=models.CASCADE)  
+    date = models.DateTimeField(auto_now_add=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  
+    
+    def calculate_total_price(self):
+        orders_in_basket = Order.objects.filter(id_client=self.id_client, status="not_done")
+        
+        total = sum(order.total_price for order in orders_in_basket)
+        
+        latest_table_price = TablePrice.objects.filter(table=self.id_table, date__lte=self.date).order_by('-date').first()
+        
+        if latest_table_price:
+            total += latest_table_price.price
+        
+        return total
 
+    def get_dish_names(self):
+        dish_names = set()  
+        orders_in_basket = Order.objects.filter(id_client=self.id_client, status="not_done")
+        
+        for order in orders_in_basket:
+            for dish in order.id_dishes.all():
+                dish_names.add(dish.name)  
+        
+        return list(dish_names) 
 
+    def mark_orders_as_done(self):
+        orders_in_basket = Order.objects.filter(id_client=self.id_client, status="not_done")
+        
+        for order in orders_in_basket:
+            order.status = "Reserved"  
+            order.save()  
 
-# class Order(models.Model):
-# user = models.ForeignKey(User, on_delete=models.CASCADE)
-# dish = models.ManyToManyField("Dish", verbose_name=_("dish"))(Dish, on_delete=models.CASCADE)
-# number = models.FloatField()
-# # class Check(models.Model):
-# # user = models.ForeignKey(User, on_delete=models.CASCADE)
-# # table = models.ForeignKey("Table", on_delete=models.CASCADE)
-# # order = models.ForeignKey("Order", on_delete=models.CASCADE)
-# # price = models.FloatField()
-# # date = models.DateTimeField(("check_date_time"), auto_now_add=False)
+    def save(self, *args, **kwargs):
+        self.total_price = self.calculate_total_price()
+        super(Check, self).save(*args, **kwargs)
+        
+        self.mark_orders_as_done()
