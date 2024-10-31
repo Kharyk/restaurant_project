@@ -4,14 +4,14 @@ from project.models import Dish, Table, DishPrice, TablePrice, Order, Check, Com
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id_client', 'number', 'date', 'total_price', 'status')
+    list_display = ('id_client', 'number', 'date', 'status')# 'total_price',
     list_filter = ('status',)
     search_fields = ('id_client__username',)
     
-    def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-        obj.total_price = obj.calculate_price()
-        obj.save(update_fields=['total_price'])
+    # def save_model(self, request, obj, form, change):
+    #     super().save_model(request, obj, form, change)
+    #     obj.total_price = obj.calculate_price()
+    #     obj.save(update_fields=['total_price'])
 
 admin.site.register(Order, OrderAdmin)
 admin.site.register(Dish)

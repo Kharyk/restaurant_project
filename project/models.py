@@ -34,7 +34,7 @@ class Table(models.Model):
     ]
     
     SORT = [
-        ("PIV", "piv"),
+        ("VIP", "vip"),
         ("General", "general"),
         ("Appointment", "appointment")
     ]
@@ -80,55 +80,31 @@ class Stars(models.Model):
     date = models.DateTimeField(auto_now_add=True) 
 
 
-
-class Order(models.Model):
-    STATUS = [
-        ("Reserved", "done"),
-        ("In the basket", "not_done")
-    ]
-    
-    id_client = models.ForeignKey(User, on_delete=models.CASCADE)
-    id_dishes = models.ManyToManyField(Dish, blank=True) 
-    id_table = models.ManyToManyField(Table, blank=True)  
-    number = models.IntegerField()  
-    date = models.DateTimeField(auto_now_add=True)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  
-    status = models.CharField(max_length=20, choices=STATUS, default="not_done")
-
-    def calculate_price(self):
-        total = 0
-        for dish in self.id_dishes.all():
-            latest_price = DishPrice.objects.filter(dish=dish, date__lte=self.date).order_by('-date').first()
-            if latest_price:
-                total += latest_price.price * self.number
-        return total
-
-    def save(self, *args, **kwargs):
-        super(Order, self).save(*args, **kwargs)
-        self.total_price = self.calculate_price()
-        super(Order, self).save(update_fields=['total_price'])
-
 class Check(models.Model):
     id_client = models.ForeignKey(User, on_delete=models.CASCADE)
-    id_table = models.ForeignKey(Table, on_delete=models.CASCADE)  
-    id_order = models.ManyToManyField(Order, blank=True)  
+    id_table = models.ForeignKey('Table', on_delete=models.CASCADE)  
     date = models.DateTimeField(auto_now_add=True)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  
-    
-    def calculate_total_price(self):
+
+    def calculate_price(self):
         if not self.id_client or not self.id_table:
-            return 0.00  
+            return 0.00 
         
-        orders_in_basket = Order.objects.filter(id_client=self.id_client, status="not_done")
+        total = 0 
         
-        total = sum(order.total_price for order in orders_in_basket) 
+        orders_in_basket = self.orders.filter(status="not_done")  
+        
+        for order in orders_in_basket:
+            for dish in order.id_dishes.all():
+                latest_price = DishPrice.objects.filter(dish=dish, date__lte=self.date).order_by('-date').first()
+                if latest_price:
+                    total += latest_price.price * Decimal(order.number)  
         
         latest_table_price = TablePrice.objects.filter(table=self.id_table, date__lte=self.date).order_by('-date').first()
         if latest_table_price:
             total += latest_table_price.price 
         
         return total
-
+    
     def get_dish_names(self):
         if not self.id_client:
             return []  
@@ -155,7 +131,25 @@ class Check(models.Model):
     def save(self, *args, **kwargs):
         super(Check, self).save(*args, **kwargs)  
         
-        self.total_price = self.calculate_total_price()
-        super(Check, self).save(update_fields=['total_price'])
+        total_price = self.calculate_price()
+        print(f'Total price for the check: {total_price:.2f}')  # Print the total price to the terminal
         
         self.mark_orders_as_done()
+
+class Order(models.Model):
+    STATUS = [
+        ("Reserved", "done"),
+        ("In the basket", "not_done")
+    ]
+    
+    id_client = models.ForeignKey(User, on_delete=models.CASCADE)
+    id_dishes = models.ManyToManyField(Dish, blank=True) 
+    id_dishesprice = models.ManyToManyField(DishPrice, blank=True) 
+    id_table = models.ForeignKey(Table, on_delete=models.CASCADE, blank=True) 
+    id_check = models.ForeignKey(Check, on_delete=models.CASCADE, blank=True, null=True, related_name="orders")
+    number = models.IntegerField()  
+    date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS, default="not_done")
+
+    
+        
