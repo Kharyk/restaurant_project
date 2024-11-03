@@ -100,16 +100,17 @@ class Check(models.Model):
         
         all_orders = self.orders.all()
         print(f'All orders related to check ID {self.id}: {[order.id for order in all_orders]}')
+         
         
-        orders_in_basket = all_orders.filter(status="In the basket")  
+        print(f'Calculating price for check ID: {self.id}.')
         
-        print(f'Calculating price for check ID: {self.id}, with {orders_in_basket.count()} orders in the basket.')
-        
-        for order in orders_in_basket:
-            print(f'Processing Order ID: {order.id}, Status: {order.status}, Number: {order.number}')
+        for order in all_orders:
+            print(f'Processing Order ID: {order.id}, Number: {order.number}')
+            
             for dish in order.id_dishes.all():
                 print(f'Found Dish: {dish.name} in Order ID: {order.id}')
                 latest_price = DishPrice.objects.filter(dish=dish, date__lte=self.date).order_by('-date').first()
+                
                 if latest_price:
                     dish_total = latest_price.price * order.number
                     total += dish_total
@@ -129,26 +130,21 @@ class Check(models.Model):
             return []  
         
         dish_names = set()  
-        orders_in_basket = self.orders.filter(status="not_done")
         
-        for order in orders_in_basket:
+        all_orders = self.orders.all()
+
+        for order in all_orders:
             for dish in order.id_dishes.all():
                 dish_names.add(dish.name)  
         
         return list(dish_names) 
 
-    def mark_orders_as_done(self):
-        if not self.id_client:
-            return
+
         
-        orders_in_basket = self.orders.filter(status="not_done")
-        
-        for order in orders_in_basket:
-            order.status = "Reserved" 
-            order.save()  
             
     def save(self, *args, **kwargs):
         super(Check, self).save(*args, **kwargs)  
+        
         
         total_price = self.calculate_price()
         print(f'Total price for the check: {total_price:.2f}') 
@@ -157,15 +153,12 @@ class Check(models.Model):
         print(f'Dishes in the check: {", ".join(dish_names)}')
         
         for order in self.orders.all():
-            print(f'Order ID: {order.id}, Status: {order.status}, Number: {order.number}')
+            print(f'Order ID: {order.id}, Number: {order.number}')
         
-        self.mark_orders_as_done()
+        
+       
 
 class Order(models.Model):
-    STATUS = [
-        ("Reserved", "done"),
-        ("In the basket", "not_done")
-    ]
     
     id_client = models.ForeignKey(User, on_delete=models.CASCADE)
     id_dishes = models.ManyToManyField(Dish, blank=True) 
@@ -174,4 +167,3 @@ class Order(models.Model):
     id_check = models.ForeignKey(Check, on_delete=models.CASCADE, blank=True, null=True, related_name="orders")
     number = models.IntegerField()  
     date = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=20, choices=STATUS, default="not_done")

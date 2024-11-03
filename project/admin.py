@@ -4,8 +4,7 @@ from project.models import Dish, Table, DishPrice, TablePrice, Order, Check, Com
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id_client', 'number', 'date', 'status')# 'total_price',
-    list_filter = ('status',)
+    list_display = ('id_client', 'number', 'date')
     search_fields = ('id_client__username',)
     
     # def save_model(self, request, obj, form, change):
