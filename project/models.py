@@ -28,6 +28,7 @@ class Dish(models.Model):
     gram = models.CharField(max_length=255)
     sort_daytime = models.CharField(max_length=15, choices=SORTDT, blank=True, null=True)
     sort = models.CharField(max_length=50, choices=SORT)
+    image = models.ImageField( upload_to='dish_img/', blank = True, null = True)
     
 
 class Table(models.Model):
@@ -47,6 +48,7 @@ class Table(models.Model):
     number_of_people = models.IntegerField()
     zone = models.CharField(max_length=10, choices=ZONE)
     sort = models.CharField(max_length=20, choices=SORT)
+    image = models.ImageField(upload_to= "table_img/", blank = True, null = True)
     
 
 class DishPrice(models.Model):
@@ -67,6 +69,7 @@ class Comment(models.Model):
     id_dish = models.ForeignKey(Dish, on_delete=models.CASCADE)
     text = models.TextField()
     date = models.DateTimeField(auto_now_add=True) 
+    image = models.ImageField( upload_to= "omment_img/", blank = True, null = True)
     
     
 class Stars(models.Model):
@@ -79,6 +82,7 @@ class Stars(models.Model):
         ("Five", "five")
     ]
     
+    id_client = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
     id_dish = models.ForeignKey(Dish, on_delete=models.CASCADE)
     stars = models.CharField(max_length=5, choices=STARS)  
     date = models.DateTimeField(auto_now_add=True) 
