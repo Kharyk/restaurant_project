@@ -16,7 +16,8 @@ A comprehensive and user-friendly web application designed to streamline restaur
 - **Frontend:** HTML | CSS | JavaScript 
 - **Database:** SQLite3
 
+
+
 ## Models
 
 ![image](https://github.com/user-attachments/assets/8f2e7eac-daf8-4b9b-8d4d-0230f9f98b22)
-
