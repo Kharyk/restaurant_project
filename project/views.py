@@ -106,7 +106,7 @@ class ContactView(LoginRequiredMixin, TemplateView):
     
     
     
-class DishCreateView(CreateView):
+class DishCreateView(LoginRequiredMixin, CreateView):
     
     model = models.Dish
     template_name =  "dish/dish_form.html"
@@ -124,14 +124,14 @@ class DishDetailView(DetailView):
     template_name = "dish/dish_detail.html"
     context_object_name = 'dish'
     
-class DishUpdateView(UpdateView):
+class DishUpdateView(LoginRequiredMixin, UpdateView):
     
     model = models.Dish
     template_name = "dish/dish_update.html"
     form_class = DishForm
     success_url = reverse_lazy("dish-detail")
     
-class DishDeleteView(DeleteView):
+class DishDeleteView(LoginRequiredMixin, DeleteView):
     
     model = models.Dish
     template_name = "dish/dish_confirm_delete.html"
@@ -140,7 +140,7 @@ class DishDeleteView(DeleteView):
     
     
     
-class TableCreateView(CreateView):
+class TableCreateView(LoginRequiredMixin, CreateView):
     
     model = models.Table
     template_name = "table/table_form.html"
@@ -159,14 +159,14 @@ class TableDetailView(DetailView):
     template_name = "table/table_detail.html"
     context_object_name = 'table'
     
-class TableUpdateView(UpdateView):
+class TableUpdateView(LoginRequiredMixin, UpdateView):
     
     model = models.Table
     template_name = "table/table_update.html"
     form_class = TableForm
     success_url = reverse_lazy("table-detail")
     
-class TableDeleteView(DeleteView):
+class TableDeleteView(LoginRequiredMixin, DeleteView):
     
     model = models.Table
     template_name = "table/table_confirm_delete.html"
@@ -174,7 +174,7 @@ class TableDeleteView(DeleteView):
     
     
 
-class DishPriceCreateView(CreateView):
+class DishPriceCreateView(LoginRequiredMixin, CreateView):
     
     model = models.DishPrice
     template_name = "dish_price/dish_price_form.html"
@@ -193,14 +193,14 @@ class DishPriceDetailView(DetailView):
     template_name = "dish_price/dish_price_dateil.html"
     context_object_name = "dish_price"
     
-class DishPriceUpdateView(UpdateView):
+class DishPriceUpdateView(LoginRequiredMixin, UpdateView):
     
     model = models.DishPrice
     template_name = "dish_price/dish_price_update.html"    
     form_class = DishPriceForm
     success_url = reverse_lazy("dish-price-detail")
     
-class DishPriceDeleteView(DeleteView):
+class DishPriceDeleteView(LoginRequiredMixin, DeleteView):
     
     model = models.DishPrice
     template_name = "dish_price/dish_price_confirm_delete.html"
@@ -209,7 +209,7 @@ class DishPriceDeleteView(DeleteView):
     
 
 
-class TablePriceCreateView(CreateView):
+class TablePriceCreateView(LoginRequiredMixin, CreateView):
     
     model = models.TablePrice
     template_name = "table_price/table_price_form.html"
@@ -228,14 +228,14 @@ class TablePriceDetailView(DetailView):
     template_name = "table_price/table_price_detail.html"
     context_object_name = "table_price"
     
-class TablePriceUpdateView(UpdateView):
+class TablePriceUpdateView(LoginRequiredMixin, UpdateView):
     
     model = models.TablePrice
     template_name = "table_price/table_price_update.html"
     form_class = TablePriceForm
     success_url = reverse_lazy("table-price-detail")
     
-class TablePriceDeleteView(DeleteView):
+class TablePriceDeleteView(LoginRequiredMixin, DeleteView):
     
     model = models.tablePrice
     template_name = "table_price/table_price_confirm_delete.html"
@@ -243,21 +243,21 @@ class TablePriceDeleteView(DeleteView):
     
 
 
-class CommentCreateView(CreateView):
+class CommentCreateView(LoginRequiredMixin, CreateView):
     
     model = models.Comment
     template_name = "comment/comment_form.html"
     form_class = CommentForm
     success_url = reverse_lazy("dish-detail")
     
-class CommentUpdateView(UpdateView):
+class CommentUpdateView(LoginRequiredMixin, UpdateView):
     
     model - models.Comment
     template_name = "comment/comment_update.html"
     form_class = CommentForm
     success_url = reverse_lazy("dish-detail")
     
-class CommentDeleteView(DeleteView):
+class CommentDeleteView(LoginRequiredMixin, DeleteView):
     
     model = models.Comment
     template_name = "comment/comment_confirm_delete.html"
@@ -265,21 +265,21 @@ class CommentDeleteView(DeleteView):
     
     
     
-class StarsCreateView(CreateView):
+class StarsCreateView(LoginRequiredMixin, CreateView):
     
     model = models.Stars
     template_name = "stars/stars_form.html"
     form_class = StarsForm
     success_url = reverse_lazy("dish-detail")
     
-class StarsUpdateView(UpdateView):
+class StarsUpdateView(LoginRequiredMixin, UpdateView):
     
     model = models.Stars
     template_name = "stars/stars_update.html"
     form_class = StarsForm
     success_url = reverse_lazy("dish-detail")
     
-class StarsDeleteView(DeleteView):
+class StarsDeleteView(LoginRequiredMixin, DeleteView):
     
     model = models.Stars
     template_name = "stars/stars_confirm_delete.html"
@@ -287,34 +287,34 @@ class StarsDeleteView(DeleteView):
     
     
     
-class CheckCreateView(CreateView):
+class CheckCreateView(LoginRequiredMixin, CreateView):
     
     model = models.Check
     template_name = "check/check_form.html"
     form_class = CheckForm
     success_url = reverse_lazy("dish-list")
     
-class CheckListView(ListView):
+class CheckListView(LoginRequiredMixin, ListView):
     
     model = models.Check
     template_name = "check/check_list.html"
     context_object_name = "checks"
     
-class CheckDetailView(DetailView):
+class CheckDetailView(LoginRequiredMixin, DetailView):
     
     model = models.Check
     template_name = "check/check_detail.html"
     form_class = CheckForm
     success_url = reverse_lazy("check-detail")
     
-class CheckUpdateView(UpdateView):
+class CheckUpdateView(LoginRequiredMixin, UpdateView):
     
     model = models.Check
     template_name = "check/check_update.html"
     form_class = CheckForm
     success_url = reverse_lazy("check-detail")
     
-class CheckDeleteView(DeleteView):
+class CheckDeleteView(LoginRequiredMixin, DeleteView):
     
     model = models.Check
     template_name = "check/check_confirm_delete.html"
@@ -323,34 +323,34 @@ class CheckDeleteView(DeleteView):
     
     
     
-class OrderCreateView(CreateView):
+class OrderCreateView(LoginRequiredMixin, CreateView):
     
     model = models.Order
     template_name = "order/order_form.html"
     form_class = OrderForm
     success_url = reverse_lazy("dish-list")
     
-class OrderListView(listView):
+class OrderListView(LoginRequiredMixin, ListView):
     
     model = models.Order
     template_name = "order/order_list.html"
     context_object_name = "orders"
     
-class OrderDetailView(DetailView):
+class OrderDetailView(LoginRequiredMixin, DetailView):
     
     model = models.Order
     template_name = "order/order_detail.html"
     form_class = OrderForm
     success_url = reverse_lazy("order-detail")
     
-class OrderUpdateView(UpdateView):
+class OrderUpdateView(LoginRequiredMixin, UpdateView):
     
     model = models.Order
     template_name = "order/order_update.html"
     form_class = OrderForm
     success_url = reverse_lazy("order-detail")
     
-class OrderDeleteView(DleteView):
+class OrderDeleteView(LoginRequiredMixin, DleteView):
     
     model = models.Order
     template_name = "order/order_confirm_delete.html"
