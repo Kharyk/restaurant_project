@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-3">
+                {% comment %} <h3 class="text-center" style="color: #00ccff;">Sort By</h3> {% endcomment %}
+                <ul class="list-group">
+                    {% for sort in sorts %}
+                        <li class="list-group-item">
+                            <a href="?sort={{ sort.0 }}" style="color: #00ccff;">{{ sort.1 }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-md-9">
+                {% comment %} <h3 class="text-center" style="color: #00ccff;">Our Menu</h3> {% endcomment %}
+                <div class="row">
+                     {% for dish in dishes %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card" style="border: 2px solid #00ccff;">
+                                {%if dish.image%}
+                                    <img src="{{ dish.image.url }}" class="card-img-top" alt="{{ dish.name }}">
+                                {%endif%}
+                                <div class="card-body">
+                                    <h5 class="card-title" style="color: #123E65;">{{ dish.name }}</h5>
+                                    <p class="card-text">{{ dish.ingredients }}</p>
+                                    <p class="card-text">{{ dish.gram }}</p>
+                                    {% for price in dish.dishprice_set.all %}
+                                        <p class="card-text" style="color: #123E65;">Price: ${{ price.price }}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

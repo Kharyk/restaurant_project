@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .views import (
+from project.views import (
     SearchResultsView,
     LoginView,
     CustomLogoutView,
@@ -115,7 +115,7 @@ urlpatterns = [
 
     # Check URLs
     path('checks/', CheckListView.as_view(), name='check-list'),
-    path('checks/create/', CheckCreateView.as_view(), name='check-create
+    path('checks/create/', CheckCreateView.as_view(), name='check-create'),
     path('checks/<int:pk>/update/', CheckUpdateView.as_view(), name='check-update'),
     path('checks/<int:pk>/delete/', CheckDeleteView.as_view(), name='check-delete'),
 
@@ -125,4 +125,4 @@ urlpatterns = [
     path('orders/<int:pk>/', OrderDetailView.as_view(), name='order-detail'),
     path('orders/<int:pk>/update/', OrderUpdateView.as_view(), name='order-update'),
     path('orders/<int:pk>/delete/', OrderDeleteView.as_view(), name='order-delete'),
-]
+] 

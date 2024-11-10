@@ -1,5 +1,5 @@
 from django import forms
-from system.models import Dish, DishPrice, Table, TablePrice, Comment, Stars, Order, Check
+from project.models import Dish, DishPrice, Table, TablePrice, Comment, Stars, Order, Check
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
@@ -54,17 +54,17 @@ class CommentForm(forms.Form):
 class StarsForm(forms.Form):
     
     class Meta:
-        model = models.Stars
+        model = Stars
         fields = ("id_client", 'id_dish','stars', 'date')
         
 class CheckForm(forms.Form):
     
     class Meta:
-        model = models.Check
+        model = Check
         fields = ("id_client", 'id_table', 'date', 'status')
         
 class OrderForm(forms.Form):
     
     class Meta:
-        model = models.Order
+        model = Order
         fields = ("id_client", 'id_dishes', 'id_dishesprice', 'id_table', "id_check", "number",  "date")
