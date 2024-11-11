@@ -10,15 +10,15 @@ class LoginForm(forms.Form):
     username = forms.CharField(max_length=255, required=True)
     password = forms.CharField(widget=forms.PasswordInput, required=True)
 
-class SignUpForm(UserCreationForm):
+class SignupForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=False)
     last_name = forms.CharField(max_length=30, required=False)
     email = forms.EmailField(max_length=254)
-    age = forms.IntegerField()
+  
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'age', 'password1', 'password2')
+        fields = ('first_name', 'last_name', 'email', 'password1', 'password2')
         exclude = ['username']
         
 class DishForm(forms.Form):

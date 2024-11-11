@@ -1,6 +1,7 @@
 from django.shortcuts import render, reverse, redirect
 from django.urls import reverse_lazy
-from project.models import Dish, DishPrice, Table, TablePrice, Comment, Stars, Order, Check, UserData
+from django.contrib.auth.models import User
+from project.models import Dish, DishPrice, Table, TablePrice, Comment, Stars, Order, Check
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.contrib.auth.views import LogoutView
 from project.forms import DishForm, TableForm, DishPriceForm, TablePriceForm, CommentForm, StarsForm, CheckForm, OrderForm
@@ -11,11 +12,12 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm
-from .forms import LoginForm, SignUpForm, SearchForm
+from .forms import LoginForm, SignupForm, SearchForm
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.utils.decorators import method_decorator
+
 
 class SearchResultsView(View):
     @method_decorator(login_required)
@@ -66,33 +68,40 @@ class CustomLogoutView(LogoutView):
 
 class SignupView(View):
     template_name = 'signup.html'
-    form_class = SignUpForm
+    form_class = SignupForm
 
     def get(self, request):
         form = self.form_class()
         return render(request, self.template_name, {'form': form})
 
-    def register_user(request):
-        if request.method == "POST":
-            form = SignUpForm(request.POST)
-            if form.is_valid():
-                user = form.save()  
-                username = form.cleaned_data['username']
-                password = form.cleaned_data['password1']
-                age = form.cleaned_data.get('age')
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            # Extract data from the form
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password1']
 
-                user_data = UserData.objects.create(user=user, age=age)
-                user_data.save()
+            # Generate a username (you can customize this logic)
+            username = email.split('@')[0]  # Use the part before the @ in the email as username
+            # Check if the username already exists
+            if User.objects.filter(username=username).exists():
+                form.add_error('email', 'The generated username is already taken. Please choose a different email address.')
+                return render(request, self.template_name, {'form': form})
 
-                user = authenticate(request, username=username, password=password)
-                if user is not None:
-                    login(request, user)
-                    return redirect('dish-list')   
+            # Create the user
+            user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email, password=password)
 
-        else:
-            form = SignUpForm()
-        
-        return render(request, 'project/signup.html', {'form': form}) ######### do not forget to write file.html
+            # Authenticate and log in the user
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('dish-list')
+
+        # If the form is not valid, print the errors for debugging
+        print(form.errors)
+        return render(request, self.template_name, {'form': form})
 
 class HomepageView(TemplateView):
     template_name = 'home.html'
@@ -105,18 +114,25 @@ class ContactView(LoginRequiredMixin, TemplateView):
     
     
     
-    
-class DishCreateView(LoginRequiredMixin, CreateView):
-    
-    model = Dish
-    template_name =  "dish/dish_form.html"
-    form_class = DishForm
-    success_url = reverse_lazy("dish-list")
+
+class DishCreateView(View):
+    template_name = 'dish/dish_create.html'  # Update to your actual template name
+
+    def get(self, request):
+        form = DishForm()  # Instantiate an empty form
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = DishForm(request.POST, request.FILES)  # Include request.FILES if you're uploading files
+        if form.is_valid():
+            form.save()  # Save the new dish to the database
+            return redirect('dish-list')  # Redirect to the dish list or another appropriate page
+        return render(request, self.template_name, {'form': form})  # Re-render the form with errors if invalid
     
 class DishListView(ListView):
     
     model = Dish
-    template_name = "dish_list.html"
+    template_name = "dish/dish_list.html"
     context_object_name = "dishes"
     
 class DishDetailView(DetailView):

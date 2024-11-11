@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h2 class="mb-0">{{ dish.name }}</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">{{ dish.ingredients }}</p>
+                        <p class="text-muted">Gram: {{ dish.gram }}</p>
+                        <div class="image-container">
+                            {% if dish.image %}
+                                <img src="{{ dish.image.url }}" alt="Dish image" class='image'>
+                            {% endif %}
+                        </div>
+
+                    
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-0">Sort daytime:</p>
+                                <span style="width: 5rem;"
+                                    {% if dish.sort_daytime == 'Breakfast' %} class="badge text-bg-warning" {% endif %}
+                                    {% if dish.sort_daytime == 'Lunch' %} class="badge text-bg-primary" {% endif %}
+                                    {% if dish.sort_daytime == 'Dinner' %} class="badge text-bg-success" {% endif %}
+                                    >{{ dish.sort_daytime }}</span>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-0">Sort:</p>
+                                <span style="width: 5rem;"
+                                    {% if dish.sort == 'Appetizers' %} class="badge text-bg-info" {% endif %}
+                                    {% if dish.sort == 'Main Courses' %} class="badge text-bg-primary" {% endif %}
+                                    {% if dish.sort == 'Side Dishes' %} class="badge text-bg-warning" {% endif %}
+                                    {% if dish.sort == 'Desserts' %} class="badge text-bg-danger" {% endif %}
+                                    {% if dish.sort == 'Beverages' %} class="badge text-bg-danger" {% endif %}
+                                    {% if dish.sort == 'Soups' %} class="badge text-bg-danger" {% endif %}
+                                    {% if dish.sort == 'Salads' %} class="badge text-bg-danger" {% endif %}
+                                    >{{ dish.sort }}</span>
+                            </div>
+                            
+                            </br>
+                            {% comment %} <div class="d-flex justify-content-end">
+                                <div class="btn-group">
+                                    {% if request.user == task.creator %}
+
+                                        <a href="{% url "system:task-update" task.id%}" class="btn btn-sm btn-warning">Edit</a>
+                                        <a href="{% url "system:task-delete" task.id%}" class="btn btn-sm btn-danger">Delete</a>
+                                    {%endif%}
+                                </div>
+                            </div> {% endcomment %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% comment %} <div class="col-md-4">
+                <div class="card shadow-sm" style="padding: 20px; overflow-y: auto; max-height: 300px; border: 1px solid #ddd; border-radius: 10px;">
+                    <div class="card-header bg-white">
+                        <h2 class="mb-0">Comments</h2>
+                    </div>
+                    <div class="card-body">
+                        <div style="padding: 20px;">
+                            {% for comment in dish.dish.all %}
+                            <div class="comment-container" style="margin-bottom: 20px; padding: 2px; border-bottom: 1px solid #ddd;">
+                                <p class="comment-text mb-0">{{ comment.text }}</p>
+                                <p><small style="color: #666; font-size: 12px;">by {{ comment.id_client.username }}</small></p>
+                                <div class="comment-actions" style="display: none;">
+                                    {% if request.user == comment.commenters or request.user == task.creator %}
+                                        {% if request.user == comment.commenters %}
+                                            <a href="{% url "system:comment-edit" comment.id%}" class="btn btn-sm btn-outline-warning edit-btn">Modify</a>
+                                        {% endif %}
+                                        {% if request.user == task.creator or request.user == comment.commenters %}
+                                            <form action="{% url "system:comment-delete" comment.id %}" method="post">
+                                                {% csrf_token %}
+                                                <button class="btn btn-sm btn-outline-danger delete-btn">Delete</button>
+                                            </form>
+                                        {% endif %}
+                                    {% endif %}
+                                </div> 
+                            </div>
+                            {% empty %}
+                                <p>No comments for this task.</p>
+                            {% endfor %}
+                        </div>
+                        <form action="{% url "comments" dish.id%}" method="post">
+                            {% csrf_token %}
+                            <div class="input-group mb-3" style="padding: 10px;">
+                                <input type="text" class="form-control" name="text" placeholder="Add a comment...">
+                                <button class="btn btn-sm btn-success" type="submit">Send</button>
+                            </div>
+                        </form>
+                    </div>
+                </div> {% endcomment %}
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="{% static 'js/comment.js' %}"></script>
+{% endblock %}

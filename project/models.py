@@ -2,10 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum, F
 
-class UserData(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    age = models.PositiveIntegerField()
-
 class Dish(models.Model):
     SORTDT = [
         ("Breakfast", "breakfast"),

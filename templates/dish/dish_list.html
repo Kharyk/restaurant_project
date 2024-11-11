@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 
 {% block content %}
     <div class="container mt-5">
@@ -19,12 +20,12 @@
                      {% for dish in dishes %}
                         <div class="col-md-4 mb-4">
                             <div class="card" style="border: 2px solid #00ccff;">
-                                {%if dish.image%}
+                                {% if dish.image %}
                                     <img src="{{ dish.image.url }}" class="card-img-top" alt="{{ dish.name }}">
-                                {%endif%}
+                                {% endif %}
                                 <div class="card-body">
                                     <h5 class="card-title" style="color: #123E65;">{{ dish.name }}</h5>
-                                    <p class="card-text">{{ dish.ingredients }}</p>
+                                    <p class="card-text">{{ dish.ingredients|truncate_words:10 }}</p>
                                     <p class="card-text">{{ dish.gram }}</p>
                                     {% for price in dish.dishprice_set.all %}
                                         <p class="card-text" style="color: #123E65;">Price: ${{ price.price }}</p>

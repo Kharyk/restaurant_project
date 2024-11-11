@@ -165,6 +165,16 @@
               
               
             }
+
+            .navbar-brand {
+                padding-top: var(--bs-navbar-brand-padding-y);
+                padding-bottom: var(--bs-navbar-brand-padding-y);
+                margin-right: var(--bs-navbar-brand-margin-end);
+                font-size: var(--bs-navbar-brand-font-size);
+                color: rgb(189 222 223);
+                text-decoration: none;
+                white-space: nowrap;
+            }
     
             main section {
                 background-color: rgba(255, 255, 255, 0.5);;
@@ -176,7 +186,10 @@
                 height: auto;
                 overflow-y: auto;
               }
-    
+            .navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
+                color: rgb(204 212 212);
+            }
+
             main section h1 {
               color: #003262;
               
