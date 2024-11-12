@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls.static import static
+from django.conf import settings
 from project.views import (
     SearchResultsView,
     LoginView,
@@ -24,6 +26,7 @@ from project.views import (
     HomepageView,
     LearnMoreView,
     ContactView,
+    AboutUsView,
     DishCreateView,
     DishListView,
     DishDetailView,
@@ -68,6 +71,9 @@ urlpatterns = [
     path('', HomepageView.as_view(), name='home'),
     path('learn-more/', LearnMoreView.as_view(), name='learn-more'),
     path('contact/', ContactView.as_view(), name='contact'),
+    path('about-us/', AboutUsView.as_view(), name='about-us'),
+
+    
     
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', CustomLogoutView.as_view(), name='logout'),
@@ -125,4 +131,4 @@ urlpatterns = [
     path('orders/<int:pk>/', OrderDetailView.as_view(), name='order-detail'),
     path('orders/<int:pk>/update/', OrderUpdateView.as_view(), name='order-update'),
     path('orders/<int:pk>/delete/', OrderDeleteView.as_view(), name='order-delete'),
-] 
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

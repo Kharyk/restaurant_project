@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="main-content">
+    <section class="text-center">
+        <h1>Delete Dish</h1>
+        <p>Are you sure you want to delete the dish "<strong>{{ dish.name }}</strong>"?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+            <a href="{% url 'dish-list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </section>
+</main>
+{% endblock %}

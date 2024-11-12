@@ -1,0 +1,103 @@
+{%load static%}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Bella Italia - About Us</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Playfair Display', serif;
+        }
+    </style>
+</head>
+<body class="bg-blue-950 text-white">
+    <header class="bg-blue-900 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-4xl font-bold">
+                𝐿𝒶 𝐵𝑒𝓁𝓁𝒶 𝐼𝓉𝒶𝓁𝒾𝒶
+            </h1>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a class="hover:text-yellow-500" href="{% url 'home' %}">Home</a></li>
+                    <li><a class="hover:text-yellow-500" href="{% url 'dish-list' %}">Menu</a></li>
+                    <li><a class="hover:text-yellow-500" href="{% url 'about-us' %}">About Us</a></li>
+                    <li><a class="hover:text-yellow-500" href="{% url 'contact' %}">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <section class="relative bg-cover bg-center py-20" style="background-image: url('{% static 'img/background_1.jpg' %}');">
+        <div class="container mx-auto text-center bg-blue-900 bg-opacity-75 p-10 rounded-lg">
+            <h2 class="text-5xl font-bold mb-4">About Us</h2>
+            <p class="text-xl mb-8">Discover the story behind La Bella Italia, our location, and meet our passionate team.</p>
+        </div>
+    </section>
+    
+    <section class="py-20">
+        <div class="container mx-auto">
+            <h2 class="text-4xl font-bold text-center mb-12">Our Story</h2>
+            <div class="bg-white text-blue-950 rounded-lg shadow-lg p-8">
+                <p>
+                    La Bella Italia was founded in 1990 with the vision of bringing authentic Italian cuisine to our community. Our founder, an Italian immigrant, wanted to share the rich culinary traditions of his homeland with the world. Over the years, we have grown from a small family-run restaurant to a beloved local institution, known for our delicious food, warm atmosphere, and exceptional service.
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <section class="py-20 bg-blue-900">
+        <h2 class="text-4xl font-bold text-center mb-8 text-white">Our Location</h2>
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white text-blue-950 rounded-lg shadow-lg p-6">
+                <p>We are located in the heart of the city, making it easy for you to enjoy a taste of Italy no matter where you are. Our address is:</p>
+                <p class="mt-4 font-bold">123 Main Street, Cityville, ST 12345</p>
+                <p class="mt-4">Our restaurant is easily accessible by public transportation, and we offer ample parking for those who prefer to drive. We look forward to welcoming you to La Bella Italia!</p>
+            </div>
+            <div class="bg-white text-blue-950 rounded-lg shadow-lg overflow-hidden">
+                <img alt="Restaurant location" class="w-full h-64 object-cover" src="{% static 'img/location.jpg' %}" />
+            </div>
+        </div>
+    </section>
+    
+    <section class="py-20">
+        <h2 class="text-4xl font-bold text-center mb-12">Meet Our Team</h2>
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white text-blue-950 rounded-lg shadow-lg p-6">
+                <img alt="Chef John Doe" class="w-full h-64 object-cover rounded-lg" src="{% static 'img/ChefJohnDoe.jpg' %}" />
+                <h3 class="text-2xl font-bold mt-4">Chef John Doe</h3>
+                <p class="mt-2">With over 20 years of experience, Chef John brings the authentic taste of Italy to every dish.</p>
+            </div>
+            <div class="bg-white text-blue-950 rounded-lg shadow-lg p-6">
+                <img alt="Manager Jane Smith" class="w-full h-64 object-cover rounded-lg" src="{% static 'img/man.jpg' %}" />
+                <h3 class="text-2xl font-bold mt-4">Manager Jane Smith</h3>
+                <p class="mt-2">Jane ensures that every guest has a memorable experience at La Bella Italia.</p>
+            </div>
+            <div class="bg-white text-blue-950 rounded-lg shadow-lg p-6">
+                <img alt="Server Mike Brown" class="w-full h-64 object-cover rounded-lg" src="{% static 'img/server.jpg' %}" />
+                <h3 class="text-2xl font-bold mt-4">Server Mike Brown</h3>
+                <p class="mt-2">Mike is known for his friendly service and extensive knowledge of our menu.</p>
+            </div>
+        </div>
+    </section>
+    
+    <footer class="bg-blue-900 py-6">
+        <div class="container mx-auto text-center">
+            <p>© 2024 La Bella Italia. All rights reserved.</p>
+            <div class="flex justify-center space-x-4 mt-4">
+                <a class="hover:text-yellow-500" href="#">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a class="hover:text-yellow-500" href="#">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a class="hover:text-yellow-500" href="#">
+                    <i class="fab fa-instagram"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -11,7 +11,7 @@
                     </div>
                     <div class="card-body">
                         <p class="text-muted">{{ dish.ingredients }}</p>
-                        <p class="text-muted">Gram: {{ dish.gram }}</p>
+                        <p class="text-muted">Gram: {{ dish.gram }} gr</p>
                         <div class="image-container">
                             {% if dish.image %}
                                 <img src="{{ dish.image.url }}" alt="Dish image" class='image'>
@@ -25,8 +25,8 @@
                                 <p class="mb-0">Sort daytime:</p>
                                 <span style="width: 5rem;"
                                     {% if dish.sort_daytime == 'Breakfast' %} class="badge text-bg-warning" {% endif %}
-                                    {% if dish.sort_daytime == 'Lunch' %} class="badge text-bg-primary" {% endif %}
-                                    {% if dish.sort_daytime == 'Dinner' %} class="badge text-bg-success" {% endif %}
+                                    {% if dish.sort_daytime == 'Lunch' %} class="badge text-bg-success" {% endif %}
+                                    {% if dish.sort_daytime == 'Dinner' %} class="badge text-bg-primary" {% endif %}
                                     >{{ dish.sort_daytime }}</span>
                             </div>
                             <div class="col-md-6">
@@ -35,23 +35,25 @@
                                     {% if dish.sort == 'Appetizers' %} class="badge text-bg-info" {% endif %}
                                     {% if dish.sort == 'Main Courses' %} class="badge text-bg-primary" {% endif %}
                                     {% if dish.sort == 'Side Dishes' %} class="badge text-bg-warning" {% endif %}
-                                    {% if dish.sort == 'Desserts' %} class="badge text-bg-danger" {% endif %}
-                                    {% if dish.sort == 'Beverages' %} class="badge text-bg-danger" {% endif %}
-                                    {% if dish.sort == 'Soups' %} class="badge text-bg-danger" {% endif %}
-                                    {% if dish.sort == 'Salads' %} class="badge text-bg-danger" {% endif %}
+                                    {% if dish.sort == 'Desserts' %} class="badge text-bg-info" {% endif %}
+                                    {% if dish.sort == 'Beverages' %} class="badge text-bg-success" {% endif %}
+                                    {% if dish.sort == 'Soups' %} class="badge text-bg-warning" {% endif %}
+                                    {% if dish.sort == 'Salads' %} class="badge text-bg-success" {% endif %}
                                     >{{ dish.sort }}</span>
                             </div>
                             
                             </br>
-                            {% comment %} <div class="d-flex justify-content-end">
+                             <div class="d-flex justify-content-end">
                                 <div class="btn-group">
-                                    {% if request.user == task.creator %}
+                                    {% if user.is_authenticated %}
+                                        {% if user.is_staff %}
 
-                                        <a href="{% url "system:task-update" task.id%}" class="btn btn-sm btn-warning">Edit</a>
-                                        <a href="{% url "system:task-delete" task.id%}" class="btn btn-sm btn-danger">Delete</a>
+                                            <a href="{% url "dish-update" dish.id%}" class="btn btn-sm btn-primary">Edit</a>
+                                            <a href="{% url "dish-delete" dish.id%}" class="btn btn-sm btn-secondary">Delete</a>
+                                        {%endif%}
                                     {%endif%}
                                 </div>
-                            </div> {% endcomment %}
+                            </div> 
                         </div>
                     </div>
                 </div>

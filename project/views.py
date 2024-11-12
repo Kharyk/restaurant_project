@@ -108,50 +108,41 @@ class HomepageView(TemplateView):
 
 class LearnMoreView(TemplateView):
     template_name = 'learn_more.html'
+    
+class AboutUsView(TemplateView):
+    template_name = 'about_us.html'
 
 class ContactView(LoginRequiredMixin, TemplateView):
     template_name = 'contact.html'
     
-    
-    
 
-class DishCreateView(View):
-    template_name = 'dish/dish_create.html'  # Update to your actual template name
 
-    def get(self, request):
-        form = DishForm()  # Instantiate an empty form
-        return render(request, self.template_name, {'form': form})
-
-    def post(self, request):
-        form = DishForm(request.POST, request.FILES)  # Include request.FILES if you're uploading files
-        if form.is_valid():
-            form.save()  # Save the new dish to the database
-            return redirect('dish-list')  # Redirect to the dish list or another appropriate page
-        return render(request, self.template_name, {'form': form})  # Re-render the form with errors if invalid
-    
 class DishListView(ListView):
-    
     model = Dish
-    template_name = "dish/dish_list.html"
-    context_object_name = "dishes"
+    template_name = 'dish/dish_list.html'
+    context_object_name = 'dishes'
+
+class DishCreateView(CreateView):
+    model = Dish
+    form_class = DishForm
+    template_name = 'dish/dish_form.html'
+    success_url = reverse_lazy('dish-list')
     
 class DishDetailView(DetailView):
     model = Dish
     template_name = "dish/dish_detail.html"
     context_object_name = 'dish'
-    
-class DishUpdateView(LoginRequiredMixin, UpdateView):
-    
+
+class DishUpdateView(UpdateView):
     model = Dish
-    template_name = "dish/dish_update.html"
     form_class = DishForm
-    success_url = reverse_lazy("dish-detail")
-    
-class DishDeleteView(LoginRequiredMixin, DeleteView):
-    
+    template_name = 'dish/dish_form.html'
+    success_url = reverse_lazy('dish-list')
+
+class DishDeleteView(DeleteView):
     model = Dish
-    template_name = "dish/dish_confirm_delete.html"
-    success_url = reverse_lazy("dish-list")
+    template_name = 'dish/dish_confirm_delete.html'
+    success_url = reverse_lazy('dish-list')
     
     
     

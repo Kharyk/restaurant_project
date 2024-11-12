@@ -1,41 +1,29 @@
-{% load custom_filters %}
+{% extends "base.html" %}
+{% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create New Dish</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> <!-- Bootstrap CSS -->
-</head>
-<body>
-
-<div class="container mt-3">
-    <h2>Create New Dish</h2>
-
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <form method="post" enctype="multipart/form-data" action="{% url 'dish-create' %}">
-                {% csrf_token %}
-                {% for field in form %}
-                    <div class="form-group">
-                        {{ field.label_tag }}
-                        {{ field|add_class:"form-control" }}  <!-- Use a custom filter if needed -->
-                        {% if field.errors %}
-                            <div class="alert alert-danger">{{ field.errors }}</div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-success">Save</button>
+{% block content %}
+<main class="main-content">
+    <section>
+        <h1 class="text-center">Create Dish</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="alert alert-danger">{{ field.errors }}</div>
+                    {% endif %}
                 </div>
-            </form>
-        </div>
-    </div>
-</div>
+            {% endfor %}
+            <form method="post" action="{% url 'dish-list' %}" >
+                <button type="submit" class="btn btn-success">Save</button>
+                <a href="{% url 'dish-list' %}" class="btn btn-secondary">Cancel</a>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> <!-- Bootstrap JS -->
-</body>
-</html>
+            </form>
+        
+            
+        </form>
+    </section>
+</main>
+{% endblock %}

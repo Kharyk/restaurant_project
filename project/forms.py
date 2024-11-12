@@ -21,11 +21,13 @@ class SignupForm(UserCreationForm):
         fields = ('first_name', 'last_name', 'email', 'password1', 'password2')
         exclude = ['username']
         
-class DishForm(forms.Form):
+
+class DishForm(forms.ModelForm):
     
     class Meta:
         model = Dish
-        fields = ('name', 'ingredients', 'gram', 'sort_daytime', "sort", "image")
+        fields = ['name', 'ingredients', 'gram', 'sort_daytime', 'sort', 'image']
+        
         
 class TableForm(forms.Form):
     
