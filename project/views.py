@@ -113,8 +113,22 @@ class ContactView(LoginRequiredMixin, TemplateView):
 
 class DishListView(ListView):
     model = Dish
-    template_name = 'dish/dish_list.html'
+    template_name = 'dish/dish_list.html'  # Update this with your actual template name
     context_object_name = 'dishes'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        dishes = context['dishes']  # This gets the list of dishes from the context
+
+        # Create a dictionary to hold the latest prices for each dish
+        latest_prices = {}
+        for dish in dishes:
+            latest_price = DishPrice.objects.filter(dish=dish).order_by('-date').first()
+            latest_prices[dish.id] = latest_price
+
+        # Add the latest prices to the context
+        context['latest_prices'] = latest_prices
+        return context
 
 class DishCreateView(CreateView):
     model = Dish
@@ -122,16 +136,25 @@ class DishCreateView(CreateView):
     template_name = 'dish/dish_form.html'
     success_url = reverse_lazy('dish-list')
     
+
 class DishDetailView(DetailView):
     model = Dish
-    template_name = "dish/dish_detail.html"
-    context_object_name = 'dish'
+    template_name = 'dish/dish_detail.html'  # Update this with your actual template name
+    context_object_name = 'dish'  # This will be used in the template
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        dish = self.object  # This gets the current dish object
+        # Get the latest price for the dish
+        latest_price = DishPrice.objects.filter(dish=dish).order_by('-date').first()
+        context['latest_price'] = latest_price  # Add the latest price to the context
+        return context
 
 class DishUpdateView(UpdateView):
     model = Dish
     form_class = DishForm
     template_name = 'dish/dish_form.html'
-    success_url = reverse_lazy('dish-list')
+    success_url = reverse_lazy('dish-list')   
 
 class DishDeleteView(DeleteView):
     model = Dish
@@ -182,13 +205,13 @@ class DishPriceCreateView(LoginRequiredMixin, CreateView):
     model = DishPrice
     template_name = "dish_price/dish_price_form.html"
     form_class = DishPriceForm
-    success_url = reverse_lazy("dish-price-list")
+    success_url = reverse_lazy("dish-list")
     
-class DishPriceListView(ListView):
+# class DishPriceListView(ListView):
     
-    model = DishPrice
-    tamplate_name = "dish_price/dish_price_list.html"
-    context_object_name = "dish_prices"
+#     model = DishPrice
+#     tamplate_name = "dish_price/dish_price_list.html"
+#     context_object_name = "dish_prices"
     
 class DishPriceDetailView(DetailView):
     
@@ -196,18 +219,18 @@ class DishPriceDetailView(DetailView):
     template_name = "dish_price/dish_price_dateil.html"
     context_object_name = "dish_price"
     
-class DishPriceUpdateView(LoginRequiredMixin, UpdateView):
+# class DishPriceUpdateView(LoginRequiredMixin, UpdateView):
     
-    model = DishPrice
-    template_name = "dish_price/dish_price_update.html"    
-    form_class = DishPriceForm
-    success_url = reverse_lazy("dish-price-detail")
+#     model = DishPrice
+#     template_name = "dish_price/dish_price_update.html"    
+#     form_class = DishPriceForm
+#     success_url = reverse_lazy("dish-price-detail")
     
-class DishPriceDeleteView(LoginRequiredMixin, DeleteView):
+# class DishPriceDeleteView(LoginRequiredMixin, DeleteView):
     
-    model = DishPrice
-    template_name = "dish_price/dish_price_confirm_delete.html"
-    success_url = reverse_lazy("dish-price-list")
+#     model = DishPrice
+#     template_name = "dish_price/dish_price_confirm_delete.html"
+#     success_url = reverse_lazy("dish-price-list")
 
     
 

@@ -21,20 +21,31 @@
             </div>
             <div class="col-md-9">
                 <div class="row">
-                     {% for dish in dishes %}
+                    {% for dish in dishes %}
                         <div class="col-md-4 mb-4">
                             <a href="{% url 'dish-detail' dish.id %}" style="text-decoration: none;">
                                 <div class="card" style="border: 2px solid #00ccff;">
                                     {% if dish.image %}
-                                        <img src="{{ dish.image.url }}" class="card-img-top" alt="{{ dish.name }}">
+                                        <img src="{{ dish.image.url }}" class="card-img-top" alt="{{ dish.name }} image">
                                     {% endif %}
                                     <div class="card-body">
                                         <h5 class="card-title" style="color: #123E65;">{{ dish.name }}</h5>
-                                        <p class="card-text">{{ dish.ingredients|truncate_words:10 }}</p>
-                                        <p class="card-text">{{ dish.gram }} gr</p>
-                                        {% for price in dish.dishprice_set.all %}
-                                            <p class="card-text" style="color: #123E65;">Price: ${{ price.price }}</p>
-                                        {% endfor %}
+                                        <p class="card-text" style="color: #1a4990;">{{ dish.ingredients|truncate_words:10 }}</p>
+                                        <p class="card-text" style="color: #1a4990;">{{ dish.gram }} gr</p>
+                                        
+                                        {% with latest_price=latest_prices|get_item:dish.id %}
+                                            {% if latest_price %}
+                                                <p class="card-text" style="color: #123E65;">Price: ${{ latest_price.price }}</p>
+                                            {% else %}
+                                                <p class="card-text" style="color: #123E65;">Price: Not available</p>
+                                            {% endif %}
+                                        {% endwith %}
+                                        {% if user.is_authenticated %}
+                                            {% if user.is_staff %}
+                                            <dr>
+                                                <a href="{% url 'dish-price-create' %}" class="btn btn-primary">+</a>
+                                            {% endif %}
+                                        {% endif %}
                                     </div>
                                 </div>
                             </a>

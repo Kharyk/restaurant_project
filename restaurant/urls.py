@@ -38,10 +38,10 @@ from project.views import (
     TableUpdateView,
     TableDeleteView,
     DishPriceCreateView,
-    DishPriceListView,
+    # DishPriceListView,
     DishPriceDetailView,
-    DishPriceUpdateView,
-    DishPriceDeleteView,
+    # DishPriceUpdateView,
+    # DishPriceDeleteView,
     TablePriceCreateView,
     TablePriceListView,
     TablePriceDetailView,
@@ -96,11 +96,11 @@ urlpatterns = [
     path('tables/<int:pk>/delete/', TableDeleteView.as_view(), name='table-delete'),
 
     # Dish Price URLs
-    path('dish-prices/', DishPriceListView.as_view(), name='dish-price-list'),
+    # path('dish-prices/', DishPriceListView.as_view(), name='dish-price-list'),
     path('dish-prices/create/', DishPriceCreateView.as_view(), name='dish-price-create'),
     path('dish-prices/<int:pk>/', DishPriceDetailView.as_view(), name='dish-price-detail'),
-    path('dish-prices/<int:pk>/update/', DishPriceUpdateView.as_view(), name='dish-price-update'),
-    path('dish-prices/<int:pk>/delete/', DishPriceDeleteView.as_view(), name='dish-price-delete'),
+    # path('dish-prices/<int:pk>/update/', DishPriceUpdateView.as_view(), name='dish-price-update'),
+    # path('dish-prices/<int:pk>/delete/', DishPriceDeleteView.as_view(), name='dish-price-delete'),
 
     # Table Price URLs
     path('table-prices/', TablePriceListView.as_view(), name='table-price-list'),
