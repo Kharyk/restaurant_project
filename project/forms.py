@@ -29,11 +29,11 @@ class DishForm(forms.ModelForm):
         fields = ['name', 'ingredients', 'gram', 'sort_daytime', 'sort', 'image']
         
         
-class TableForm(forms.Form):
+class TableForm(forms.ModelForm):
     
     class Meta:
         model = Table
-        fields = ('name', 'number_of_people', "zone", "sort", 'image')
+        fields = ['name', 'number_of_people', "zone", "sort", 'image']
         
 class DishPriceForm(forms.Form):
     

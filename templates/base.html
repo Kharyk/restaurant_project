@@ -250,7 +250,7 @@
                             <a class="nav-link active" aria-current="page" href="{% url "dish-list" %}">Menu</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="">Table</a>
+                            <a class="nav-link active" href="{% url "table-list" %}">Table</a>
                         </li>
                         <li class="nav-item">
                           <a class="nav-link active" href="">Contact</a>
@@ -285,8 +285,8 @@
               <div class="col-md-4 col-sm-6">
                   <h4>Quick Links</h4>
                   <ul>
-                      <li><a href="" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Menu</a></li>
-                      <li><a href="" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Table</a></li>
+                      <li><a href="{% url "dish-list" %}" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Menu</a></li>
+                      <li><a href="{% url "table-list" %}" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Table</a></li>
                       <li><a href="" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Contact Us</a></li>
 
                       {%comment%}<li><a href="#">Reports</a></li>

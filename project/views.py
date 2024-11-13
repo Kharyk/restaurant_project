@@ -77,29 +77,23 @@ class SignupView(View):
     def post(self, request):
         form = self.form_class(request.POST)
         if form.is_valid():
-            # Extract data from the form
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password1']
 
-            # Generate a username (you can customize this logic)
             username = email.split('@')[0]  # Use the part before the @ in the email as username
-            # Check if the username already exists
             if User.objects.filter(username=username).exists():
                 form.add_error('email', 'The generated username is already taken. Please choose a different email address.')
                 return render(request, self.template_name, {'form': form})
 
-            # Create the user
             user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email, password=password)
 
-            # Authenticate and log in the user
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
                 return redirect('dish-list')
 
-        # If the form is not valid, print the errors for debugging
         print(form.errors)
         return render(request, self.template_name, {'form': form})
 
@@ -145,7 +139,8 @@ class DishDeleteView(DeleteView):
     success_url = reverse_lazy('dish-list')
     
     
-    
+
+
     
 class TableCreateView(LoginRequiredMixin, CreateView):
     
@@ -167,11 +162,12 @@ class TableDetailView(DetailView):
     context_object_name = 'table'
     
 class TableUpdateView(LoginRequiredMixin, UpdateView):
-    
     model = Table
-    template_name = "table/table_update.html"
+    template_name = "table/table_form.html"
     form_class = TableForm
-    success_url = reverse_lazy("table-detail")
+
+    def get_success_url(self):
+        return reverse('table-detail', kwargs={'pk': self.object.pk})
     
 class TableDeleteView(LoginRequiredMixin, DeleteView):
     

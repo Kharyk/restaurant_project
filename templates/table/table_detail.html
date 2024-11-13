@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h2 class="mb-0">{{ table.name }}</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="image-container">
+                            {% if table.image %}
+                                <img src="{{ table.image.url }}" alt="Table image" class='image'>
+                            {% endif %}
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <p class="mb-0">Maximal people:</p>
+                                <span style="width: 5rem;"
+                                    {% if table.number_of_people %} class="badge text-bg-primary" {% endif %}
+                                    >{{ table.number_of_people }}</span>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="mb-0">Zone:</p>
+                                <span style="width: 5rem;"
+                                    {% if table.zone == 'Indoors' %} class="badge text-bg-primary" {% endif %}
+                                    {% if table.zone == 'Outdoors' %} class="badge text-bg-success" {% endif %}
+                                    >{{ table.zone }}</span>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="mb-0">Sort:</p>
+                                <span style="width: 5rem;"
+                                    {% if table.sort == 'VIP' %} class="badge text-bg-primary" {% endif %}
+                                    {% if table.sort == 'General' %} class="badge text-bg-secondary" {% endif %}
+                                    {% if table.sort == 'Appointment' %} class="badge text-bg-info" {% endif %}
+                                    >{{ table.sort }}</span>
+                            </div>
+                            
+                            </br>
+                             <div class="d-flex justify-content-end">
+                                <div class="btn-group">
+                                    {% if user.is_authenticated %}
+                                        {% if user.is_staff %}
+
+                                            <a href="{% url "table-update" table.id%}" class="btn btn-sm btn-primary">Edit</a>
+                                            <a href="{% url "table-delete" table.id%}" class="btn btn-sm btn-secondary">Delete</a>
+                                        {%endif%}
+                                    {%endif%}
+                                </div>
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% comment %} <div class="col-md-4">
+                <div class="card shadow-sm" style="padding: 20px; overflow-y: auto; max-height: 300px; border: 1px solid #ddd; border-radius: 10px;">
+                    <div class="card-header bg-white">
+                        <h2 class="mb-0">Comments</h2>
+                    </div>
+                    <div class="card-body">
+                        <div style="padding: 20px;">
+                            {% for comment in table.table.all %}
+                            <div class="comment-container" style="margin-bottom: 20px; padding: 2px; border-bottom: 1px solid #ddd;">
+                                <p class="comment-text mb-0">{{ comment.text }}</p>
+                                <p><small style="color: #666; font-size: 12px;">by {{ comment.id_client.username }}</small></p>
+                                <div class="comment-actions" style="display: none;">
+                                    {% if request.user == comment.commenters or request.user == task.creator %}
+                                        {% if request.user == comment.commenters %}
+                                            <a href="{% url "system:comment-edit" comment.id%}" class="btn btn-sm btn-outline-warning edit-btn">Modify</a>
+                                        {% endif %}
+                                        {% if request.user == task.creator or request.user == comment.commenters %}
+                                            <form action="{% url "system:comment-delete" comment.id %}" method="post">
+                                                {% csrf_token %}
+                                                <button class="btn btn-sm btn-outline-danger delete-btn">Delete</button>
+                                            </form>
+                                        {% endif %}
+                                    {% endif %}
+                                </div> 
+                            </div>
+                            {% empty %}
+                                <p>No comments for this task.</p>
+                            {% endfor %}
+                        </div>
+                        <form action="{% url "comments" table.id%}" method="post">
+                            {% csrf_token %}
+                            <div class="input-group mb-3" style="padding: 10px;">
+                                <input type="text" class="form-control" name="text" placeholder="Add a comment...">
+                                <button class="btn btn-sm btn-success" type="submit">Send</button>
+                            </div>
+                        </form>
+                    </div>
+                </div> {% endcomment %}
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="{% static 'js/comment.js' %}"></script>
+{% endblock %}

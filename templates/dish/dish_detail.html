@@ -27,6 +27,8 @@
                                     {% if dish.sort_daytime == 'Breakfast' %} class="badge text-bg-warning" {% endif %}
                                     {% if dish.sort_daytime == 'Lunch' %} class="badge text-bg-success" {% endif %}
                                     {% if dish.sort_daytime == 'Dinner' %} class="badge text-bg-primary" {% endif %}
+                                    {% if dish.sort_daytime == None %} class="badge text-bg-secondary" {% endif %}
+
                                     >{{ dish.sort_daytime }}</span>
                             </div>
                             <div class="col-md-6">
@@ -39,6 +41,8 @@
                                     {% if dish.sort == 'Beverages' %} class="badge text-bg-success" {% endif %}
                                     {% if dish.sort == 'Soups' %} class="badge text-bg-warning" {% endif %}
                                     {% if dish.sort == 'Salads' %} class="badge text-bg-success" {% endif %}
+                                    {% if dish.sort == None %} class="badge text-bg-secondary" {% endif %}
+
                                     >{{ dish.sort }}</span>
                             </div>
                             

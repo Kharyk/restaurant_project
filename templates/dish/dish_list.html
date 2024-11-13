@@ -5,7 +5,7 @@
     <div class="container mt-5">
         {% if user.is_authenticated %}
             {% if user.is_staff %}
-                <a href="{% url 'dish-create' %}" class="btn btn-primary">Create Dish</a>
+                <a href="{% url 'dish-create' %}" class="btn btn-primary">+</a>
             {% endif %}
         {% endif %}
 
