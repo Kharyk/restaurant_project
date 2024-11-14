@@ -111,24 +111,33 @@ class ContactView(LoginRequiredMixin, TemplateView):
     
 
 
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+
+
 class DishListView(ListView):
     model = Dish
-    template_name = 'dish/dish_list.html'  # Update this with your actual template name
+    template_name = 'dish/dish_list.html'
     context_object_name = 'dishes'
-
+    paginate_by = 3
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        dishes = context['dishes']  # This gets the list of dishes from the context
+        dishes = context['dishes']
 
-        # Create a dictionary to hold the latest prices for each dish
         latest_prices = {}
         for dish in dishes:
             latest_price = DishPrice.objects.filter(dish=dish).order_by('-date').first()
             latest_prices[dish.id] = latest_price
 
-        # Add the latest prices to the context
         context['latest_prices'] = latest_prices
         return context
+
+    def get(self, request): 
+        super().get(request) 
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest': 
+            return render (request, 'dish/list.html', context=self.get_context_data()) 
+        return render(request, self.template_name, context=self.get_context_data())
 
 class DishCreateView(CreateView):
     model = Dish
