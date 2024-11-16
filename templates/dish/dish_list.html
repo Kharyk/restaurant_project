@@ -8,6 +8,10 @@
         {% if user.is_authenticated %}
             {% if user.is_staff %}
                 <a href="{% url 'dish-create' %}" class="btn btn-primary">+</a>
+                <br>
+                <br>
+
+                
             {% endif %}
         {% endif %}
         <div class= 'row text-left poll-container' >

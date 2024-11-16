@@ -43,10 +43,10 @@ from project.views import (
     # DishPriceUpdateView,
     # DishPriceDeleteView,
     TablePriceCreateView,
-    TablePriceListView,
+    # TablePriceListView,
     TablePriceDetailView,
-    TablePriceUpdateView,
-    TablePriceDeleteView,
+    # TablePriceUpdateView,
+    # TablePriceDeleteView,
     CommentCreateView,
     CommentUpdateView,
     CommentDeleteView,
@@ -97,17 +97,17 @@ urlpatterns = [
 
     # Dish Price URLs
     # path('dish-prices/', DishPriceListView.as_view(), name='dish-price-list'),
-    path('dish-prices/create/', DishPriceCreateView.as_view(), name='dish-price-create'),
+    path('dish/<int:pk>/dish-prices/create/', DishPriceCreateView.as_view(), name='dish-price-create'), 
     path('dish-prices/<int:pk>/', DishPriceDetailView.as_view(), name='dish-price-detail'),
     # path('dish-prices/<int:pk>/update/', DishPriceUpdateView.as_view(), name='dish-price-update'),
     # path('dish-prices/<int:pk>/delete/', DishPriceDeleteView.as_view(), name='dish-price-delete'),
 
     # Table Price URLs
-    path('table-prices/', TablePriceListView.as_view(), name='table-price-list'),
+    # path('table-prices/', TablePriceListView.as_view(), name='table-price-list'),
     path('table-prices/create/', TablePriceCreateView.as_view(), name='table-price-create'),
     path('table-prices/<int:pk>/', TablePriceDetailView.as_view(), name='table-price-detail'),
-    path('table-prices/<int:pk>/update/', TablePriceUpdateView.as_view(), name='table-price-update'),
-    path('table-prices/<int:pk>/delete/', TablePriceDeleteView.as_view(), name='table-price-delete'),
+    # path('table-prices/<int:pk>/update/', TablePriceUpdateView.as_view(), name='table-price-update'),
+    # path('table-prices/<int:pk>/delete/', TablePriceDeleteView.as_view(), name='table-price-delete'),
 
     # Comment URLs
     path('comments/create/', CommentCreateView.as_view(), name='comment-create'),

@@ -17,6 +17,8 @@ from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.utils.decorators import method_decorator
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 
 
 class SearchResultsView(View):
@@ -111,15 +113,13 @@ class ContactView(LoginRequiredMixin, TemplateView):
     
 
 
-from django.http import JsonResponse
-from django.template.loader import render_to_string
 
 
 class DishListView(ListView):
     model = Dish
     template_name = 'dish/dish_list.html'
     context_object_name = 'dishes'
-    paginate_by = 3
+    paginate_by = 8
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -148,15 +148,14 @@ class DishCreateView(CreateView):
 
 class DishDetailView(DetailView):
     model = Dish
-    template_name = 'dish/dish_detail.html'  # Update this with your actual template name
-    context_object_name = 'dish'  # This will be used in the template
+    template_name = 'dish/dish_detail.html' 
+    context_object_name = 'dish'  
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        dish = self.object  # This gets the current dish object
-        # Get the latest price for the dish
+        dish = self.object  
         latest_price = DishPrice.objects.filter(dish=dish).order_by('-date').first()
-        context['latest_price'] = latest_price  # Add the latest price to the context
+        context['latest_price'] = latest_price  
         return context
 
 class DishUpdateView(UpdateView):
@@ -186,6 +185,13 @@ class TableListView(ListView):
     model = Table
     template_name = "table/table_list.html"
     context_object_name = "tables"
+    paginate_by = 4
+    
+    def get(self, request): 
+        super().get(request) 
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest': 
+            return render (request, 'table/list.html', context=self.get_context_data()) 
+        return render(request, self.template_name, context=self.get_context_data())
     
 class TableDetailView(DetailView):
     
@@ -210,11 +216,21 @@ class TableDeleteView(LoginRequiredMixin, DeleteView):
     
 
 class DishPriceCreateView(LoginRequiredMixin, CreateView):
-    
     model = DishPrice
     template_name = "dish_price/dish_price_form.html"
     form_class = DishPriceForm
-    success_url = reverse_lazy("dish-list")
+
+    def get_success_url(self):
+        return reverse_lazy("dish-detail", kwargs={'pk': self.kwargs['pk']})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['dish'] = Dish.objects.get(pk=self.kwargs['pk'])  
+        return context
+
+    def form_valid(self, form):
+        form.instance.dish_id = self.kwargs['pk']  
+        return super().form_valid(form)
     
 # class DishPriceListView(ListView):
     
@@ -242,20 +258,29 @@ class DishPriceDetailView(DetailView):
 #     success_url = reverse_lazy("dish-price-list")
 
     
-
-
 class TablePriceCreateView(LoginRequiredMixin, CreateView):
     
     model = TablePrice
     template_name = "table_price/table_price_form.html"
     form_class = TablePriceForm
-    success_url = reverse_lazy("table-price-list")
     
-class TablePriceListView(ListView):
+    def get_success_url(self):
+        return reverse_lazy("table-detail", kwargs={'pk': self.kwargs['pk']})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['table'] = Table.objects.get(pk=self.kwargs['pk'])  
+        return context
+
+    def form_valid(self, form):
+        form.instance.table_id = self.kwargs['pk']  
+        return super().form_valid(form)
     
-    model = TablePrice
-    template_name = "table_price/table_price_list.html"
-    context_object_name = "table_prices"
+# class TablePriceListView(ListView):
+    
+#     model = TablePrice
+#     template_name = "table_price/table_price_list.html"
+#     context_object_name = "table_prices"
     
 class TablePriceDetailView(DetailView):
     
@@ -263,18 +288,18 @@ class TablePriceDetailView(DetailView):
     template_name = "table_price/table_price_detail.html"
     context_object_name = "table_price"
     
-class TablePriceUpdateView(LoginRequiredMixin, UpdateView):
+# class TablePriceUpdateView(LoginRequiredMixin, UpdateView):
     
-    model = TablePrice
-    template_name = "table_price/table_price_update.html"
-    form_class = TablePriceForm
-    success_url = reverse_lazy("table-price-detail")
+#     model = TablePrice
+#     template_name = "table_price/table_price_update.html"
+#     form_class = TablePriceForm
+#     success_url = reverse_lazy("table-price-detail")
     
-class TablePriceDeleteView(LoginRequiredMixin, DeleteView):
+# class TablePriceDeleteView(LoginRequiredMixin, DeleteView):
     
-    model = TablePrice
-    template_name = "table_price/table_price_confirm_delete.html"
-    success_url = reverse_lazy("table-price-list")
+#     model = TablePrice
+#     template_name = "table_price/table_price_confirm_delete.html"
+#     success_url = reverse_lazy("table-price-list")
     
 
 

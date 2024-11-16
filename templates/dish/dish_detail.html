@@ -52,6 +52,7 @@
                                 {% else %}
                                     <p class="card-text" style="color: #123E65;">Price: Not available</p>
                                 {% endif %}
+                                
                             </div>
                             
                             
@@ -60,9 +61,12 @@
                                 <div class="btn-group">
                                     {% if user.is_authenticated %}
                                         {% if user.is_staff %}
-
+                                    
                                             <a href="{% url "dish-update" dish.id%}" class="btn btn-sm btn-primary">Edit</a>
+                                            <a href="{% url 'dish-price-create' dish.id %}" class="btn btn-sm btn-info">Add a new price</a>
+
                                             <a href="{% url "dish-delete" dish.id%}" class="btn btn-sm btn-secondary">Delete</a>
+
                                         {%endif%}
                                     {%endif%}
                                 </div>

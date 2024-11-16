@@ -1,7 +1,7 @@
 {% load static%}
 {% load custom_filters %}
-{%for dish in page_obj%}
-<div class="col-md-4 mb-4">
+{% for dish in page_obj %}
+<div class="col-md-3 mb-4">
     <a href="{% url 'dish-detail' dish.id %}" style="text-decoration: none;">
         <div class="card" style="border: 2px solid #00ccff;">
             {% if dish.image %}

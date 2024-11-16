@@ -39,13 +39,14 @@
                                     >{{ table.sort }}</span>
                             </div>
                             
-                            </br>
+                            <br>
                              <div class="d-flex justify-content-end">
                                 <div class="btn-group">
                                     {% if user.is_authenticated %}
                                         {% if user.is_staff %}
-
+                                        <br>
                                             <a href="{% url "table-update" table.id%}" class="btn btn-sm btn-primary">Edit</a>
+                                            {% comment %} <a href="{% url 'table-price-create' table.id %}" class="btn btn-sm btn-info">Add a new price</a> {% endcomment %}
                                             <a href="{% url "table-delete" table.id%}" class="btn btn-sm btn-secondary">Delete</a>
                                         {%endif%}
                                     {%endif%}

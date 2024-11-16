@@ -1,14 +1,21 @@
 {% extends 'base.html' %}
 {% load custom_filters %}
+{% load static %}
+
 
 {% block content %}
     <div class="container mt-5">
         {% if user.is_authenticated %}
             {% if user.is_staff %}
                 <a href="{% url 'table-create' %}" class="btn btn-primary">+</a>
+                <br>
+                <br>
+                
             {% endif %}
         {% endif %}
-
+        <div class= 'row text-left poll-container' >
+            {% include  "table/list.html"%}
+        </div>
         <div class="row">
             <div class="col-md-3">
                 <ul class="list-group">
@@ -19,31 +26,13 @@
                     {% endfor %}
                 </ul>
             </div>
-            <div class="col-md-9">
-                <div class="row">
-                     {% for table in tables %}
-                        <div class="col-md-4 mb-4">
-                            <a href="{% url 'table-detail' table.id %}" style="text-decoration: none;">
-                                <div class="card" style="border: 2px solid #00ccff;">
-                                    {% if table.image %}
-                                        <img src="{{ table.image.url }}" class="card-img-top" alt="{{ table.name }}">
-                                    {% endif %}
-                                    <div class="card-body">
-                                        <h5 class="card-title" style="color: #123E65;">Name/number: {{ table.name }}</h5>
-                                        <p class="card-text">Maximal people: {{ table.number_of_people}}</p>
-                                        <p class="card-text">Sort: {{ table.sort }}</p>
-                                        <p class="card-text">{{ table.zone }}</p>
+          
 
-                                        {% for price in table.tableprice_set.all %}
-                                            <p class="card-text" style="color: #123E65;">Price: ${{ price.price }}</p>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
+        <div class="text-center mt-4">
+            <button id="show-more" class="btn btn-primary" onclick="showMore()">Show More</button>
         </div>
+
+        <input type="hidden" id="page-cure" value="1">
+        <input type="hidden" id="page-num" value="{{ total_pages }}"> 
     </div>
 {% endblock %}
