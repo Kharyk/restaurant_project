@@ -1,0 +1,21 @@
+
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="main-content">
+    <section>
+        <h1 class="text-center">Add Price for {{ dish.name }}</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Add Price</button>
+            <a href="{% url 'dish-detail' dish.id %}" class="btn btn-secondary">Cancel</a>
+        </form>
+        
+            
+        </form>
+    </section>
+</main>
+{% endblock %}

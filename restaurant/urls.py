@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .views import (
+from django.conf.urls.static import static
+from django.conf import settings
+from project.views import (
     SearchResultsView,
     LoginView,
     CustomLogoutView,
@@ -24,6 +26,7 @@ from .views import (
     HomepageView,
     LearnMoreView,
     ContactView,
+    AboutUsView,
     DishCreateView,
     DishListView,
     DishDetailView,
@@ -35,15 +38,15 @@ from .views import (
     TableUpdateView,
     TableDeleteView,
     DishPriceCreateView,
-    DishPriceListView,
+    # DishPriceListView,
     DishPriceDetailView,
-    DishPriceUpdateView,
-    DishPriceDeleteView,
+    # DishPriceUpdateView,
+    # DishPriceDeleteView,
     TablePriceCreateView,
-    TablePriceListView,
+    # TablePriceListView,
     TablePriceDetailView,
-    TablePriceUpdateView,
-    TablePriceDeleteView,
+    # TablePriceUpdateView,
+    # TablePriceDeleteView,
     CommentCreateView,
     CommentUpdateView,
     CommentDeleteView,
@@ -68,6 +71,9 @@ urlpatterns = [
     path('', HomepageView.as_view(), name='home'),
     path('learn-more/', LearnMoreView.as_view(), name='learn-more'),
     path('contact/', ContactView.as_view(), name='contact'),
+    path('about-us/', AboutUsView.as_view(), name='about-us'),
+
+    
     
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', CustomLogoutView.as_view(), name='logout'),
@@ -90,18 +96,18 @@ urlpatterns = [
     path('tables/<int:pk>/delete/', TableDeleteView.as_view(), name='table-delete'),
 
     # Dish Price URLs
-    path('dish-prices/', DishPriceListView.as_view(), name='dish-price-list'),
-    path('dish-prices/create/', DishPriceCreateView.as_view(), name='dish-price-create'),
+    # path('dish-prices/', DishPriceListView.as_view(), name='dish-price-list'),
+    path('dish/<int:pk>/dish-prices/create/', DishPriceCreateView.as_view(), name='dish-price-create'), 
     path('dish-prices/<int:pk>/', DishPriceDetailView.as_view(), name='dish-price-detail'),
-    path('dish-prices/<int:pk>/update/', DishPriceUpdateView.as_view(), name='dish-price-update'),
-    path('dish-prices/<int:pk>/delete/', DishPriceDeleteView.as_view(), name='dish-price-delete'),
+    # path('dish-prices/<int:pk>/update/', DishPriceUpdateView.as_view(), name='dish-price-update'),
+    # path('dish-prices/<int:pk>/delete/', DishPriceDeleteView.as_view(), name='dish-price-delete'),
 
     # Table Price URLs
-    path('table-prices/', TablePriceListView.as_view(), name='table-price-list'),
-    path('table-prices/create/', TablePriceCreateView.as_view(), name='table-price-create'),
+    # path('table-prices/', TablePriceListView.as_view(), name='table-price-list'),
+    path('table/<int:pk>/table-prices/create/', TablePriceCreateView.as_view(), name='table-price-create'),
     path('table-prices/<int:pk>/', TablePriceDetailView.as_view(), name='table-price-detail'),
-    path('table-prices/<int:pk>/update/', TablePriceUpdateView.as_view(), name='table-price-update'),
-    path('table-prices/<int:pk>/delete/', TablePriceDeleteView.as_view(), name='table-price-delete'),
+    # path('table-prices/<int:pk>/update/', TablePriceUpdateView.as_view(), name='table-price-update'),
+    # path('table-prices/<int:pk>/delete/', TablePriceDeleteView.as_view(), name='table-price-delete'),
 
     # Comment URLs
     path('comments/create/', CommentCreateView.as_view(), name='comment-create'),
@@ -115,7 +121,7 @@ urlpatterns = [
 
     # Check URLs
     path('checks/', CheckListView.as_view(), name='check-list'),
-    path('checks/create/', CheckCreateView.as_view(), name='check-create
+    path('checks/create/', CheckCreateView.as_view(), name='check-create'),
     path('checks/<int:pk>/update/', CheckUpdateView.as_view(), name='check-update'),
     path('checks/<int:pk>/delete/', CheckDeleteView.as_view(), name='check-delete'),
 
@@ -125,4 +131,4 @@ urlpatterns = [
     path('orders/<int:pk>/', OrderDetailView.as_view(), name='order-detail'),
     path('orders/<int:pk>/update/', OrderUpdateView.as_view(), name='order-update'),
     path('orders/<int:pk>/delete/', OrderDeleteView.as_view(), name='order-delete'),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,41 @@
+{% extends 'home_base.html' %}
+
+{% block content %}
+    <style>
+        
+
+        input[type="text"], input[type="password"] {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0062cc;
+        }
+    </style>
+    <h1>𝐿𝑜𝑔 𝒾𝓃</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <br>
+        <button type="submit">𝐿𝑜𝑔 𝒾𝓃</button>
+    </form>
+{%endblock%}

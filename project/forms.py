@@ -1,5 +1,5 @@
 from django import forms
-from system.models import Dish, DishPrice, Table, TablePrice, Comment, Stars, Order, Check
+from project.models import Dish, DishPrice, Table, TablePrice, Comment, Stars, Order, Check
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
@@ -10,40 +10,42 @@ class LoginForm(forms.Form):
     username = forms.CharField(max_length=255, required=True)
     password = forms.CharField(widget=forms.PasswordInput, required=True)
 
-class SignUpForm(UserCreationForm):
+class SignupForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=False)
     last_name = forms.CharField(max_length=30, required=False)
     email = forms.EmailField(max_length=254)
-    age = forms.IntegerField()
+  
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'age', 'password1', 'password2')
+        fields = ('first_name', 'last_name', 'email', 'password1', 'password2')
         exclude = ['username']
         
-class DishForm(forms.Form):
+
+class DishForm(forms.ModelForm):
     
     class Meta:
         model = Dish
-        fields = ('name', 'ingredients', 'gram', 'sort_daytime', "sort", "image")
+        fields = ['name', 'ingredients', 'gram', 'sort_daytime', 'sort', 'image']
         
-class TableForm(forms.Form):
+        
+class TableForm(forms.ModelForm):
     
     class Meta:
         model = Table
-        fields = ('name', 'number_of_people', "zone", "sort", 'image')
+        fields = ['name', 'number_of_people', "zone", "sort", 'image']
         
-class DishPriceForm(forms.Form):
+class DishPriceForm(forms.ModelForm):
     
     class Meta:
         model = DishPrice
-        fields = ('dish', 'price', 'date')
+        fields = ['price', 'date']
         
-class TablePriceForm(forms.Form):
+class TablePriceForm(forms.ModelForm):
     
     class Meta:
         model = TablePrice
-        fields = ('table', 'price', 'date')
+        fields = [ 'price', 'date']
         
 class CommentForm(forms.Form):
     
@@ -54,17 +56,17 @@ class CommentForm(forms.Form):
 class StarsForm(forms.Form):
     
     class Meta:
-        model = models.Stars
+        model = Stars
         fields = ("id_client", 'id_dish','stars', 'date')
         
 class CheckForm(forms.Form):
     
     class Meta:
-        model = models.Check
+        model = Check
         fields = ("id_client", 'id_table', 'date', 'status')
         
 class OrderForm(forms.Form):
     
     class Meta:
-        model = models.Order
+        model = Order
         fields = ("id_client", 'id_dishes', 'id_dishesprice', 'id_table', "id_check", "number",  "date")

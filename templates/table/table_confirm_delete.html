@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="main-content">
+    <section class="text-center">
+        <h1>Delete Table</h1>
+        <p>Are you sure you want to delete the table "<strong>{{ table.name }}</strong>"?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+            <a href="{% url 'table-list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </section>
+</main>
+{% endblock %}

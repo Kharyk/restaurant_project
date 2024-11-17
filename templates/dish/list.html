@@ -1,0 +1,24 @@
+{% load static%}
+{% load custom_filters %}
+{% for dish in page_obj %}
+<div class="col-md-3 mb-4">
+    <a href="{% url 'dish-detail' dish.id %}" style="text-decoration: none;">
+        <div class="card" style="border: 2px solid #00ccff;">
+            {% if dish.image %}
+                <img src="{{ dish.image.url }}" class="card-img-top" alt="{{ dish.name }} image">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title" style="color: #123E65;">{{ dish.name }}</h5>
+                <p class="card-text" style="color: #1a4990;">{{ dish.ingredients|truncate_words:10 }}</p>
+                <p class="card-text" style="color: #1a4990;">{{ dish.gram }} gr</p>
+                
+                {% with latest_price=latest_prices|get_item:dish.id %}
+                    <p class="card-text" style="color: #123E65;">
+                        Price: {% if latest_price %} ${{ latest_price.price }} {% else %} Not available {% endif %}
+                    </p>
+                {% endwith %}
+            </div>
+        </div>
+    </a>
+</div>
+{% endfor %}

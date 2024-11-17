@@ -1,5 +1,5 @@
 from django.contrib import admin
-from project.models import Dish, Table, DishPrice, TablePrice, Order, Check, Comment, Stars, UserData
+from project.models import Dish, Table, DishPrice, TablePrice, Order, Check, Comment, Stars
 
 
 
@@ -20,7 +20,6 @@ admin.site.register(TablePrice)
 admin.site.register(Check)
 admin.site.register(Comment)
 admin.site.register(Stars)
-admin.site.register(UserData)
 
 
 # Register your models here.

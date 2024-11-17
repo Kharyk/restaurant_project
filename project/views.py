@@ -1,6 +1,7 @@
 from django.shortcuts import render, reverse, redirect
 from django.urls import reverse_lazy
-from .models import Dish, DishPrice, Table, TablePrice, Comment, Stars, Order, Check, UserDate
+from django.contrib.auth.models import User
+from project.models import Dish, DishPrice, Table, TablePrice, Comment, Stars, Order, Check
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.contrib.auth.views import LogoutView
 from project.forms import DishForm, TableForm, DishPriceForm, TablePriceForm, CommentForm, StarsForm, CheckForm, OrderForm
@@ -16,6 +17,9 @@ from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.utils.decorators import method_decorator
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+
 
 class SearchResultsView(View):
     @method_decorator(login_required)
@@ -53,7 +57,7 @@ class LoginView(View):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('')  ######### do not forget to write file.html
+                return redirect('dish-list')  
             else:
                 form.add_error(None, 'Invalid username or password')
         return render(request, self.template_name, {'form': form})
@@ -72,194 +76,269 @@ class SignupView(View):
         form = self.form_class()
         return render(request, self.template_name, {'form': form})
 
-    def register_user(request):
-        if request.method == "POST":
-            form = SignUpForm(request.POST)
-            if form.is_valid():
-                user = form.save()  
-                username = form.cleaned_data['username']
-                password = form.cleaned_data['password1']
-                age = form.cleaned_data.get('age')
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password1']
 
-                user_data = UserData.objects.create(user=user, age=age)
-                user_data.save()
+            username = email.split('@')[0]  # Use the part before the @ in the email as username
+            if User.objects.filter(username=username).exists():
+                form.add_error('email', 'The generated username is already taken. Please choose a different email address.')
+                return render(request, self.template_name, {'form': form})
 
-                user = authenticate(request, username=username, password=password)
-                if user is not None:
-                    login(request, user)
-                    return redirect('')   ######### do not forget to write file.html
+            user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email, password=password)
 
-        else:
-            form = SignUpForm()
-        
-        return render(request, 'project/signup.html', {'form': form}) ######### do not forget to write file.html
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('dish-list')
+
+        print(form.errors)
+        return render(request, self.template_name, {'form': form})
 
 class HomepageView(TemplateView):
     template_name = 'home.html'
 
 class LearnMoreView(TemplateView):
     template_name = 'learn_more.html'
+    
+class AboutUsView(TemplateView):
+    template_name = 'about_us.html'
 
 class ContactView(LoginRequiredMixin, TemplateView):
     template_name = 'contact.html'
     
-    
-    
-    
-class DishCreateView(LoginRequiredMixin, CreateView):
-    
-    model = models.Dish
-    template_name =  "dish/dish_form.html"
-    form_class = DishForm
-    success_url = reverse_lazy("dish-list")
-    
+
+
+
+
 class DishListView(ListView):
+    model = Dish
+    template_name = 'dish/dish_list.html'
+    context_object_name = 'dishes'
+    paginate_by = 8
     
-    model = models.Dish
-    template_name = "dish/dish_list.html"
-    context_object_name = "dishes"
-    
-class DishDetailView(DetailView):
-    model = models.Dish
-    template_name = "dish/dish_detail.html"
-    context_object_name = 'dish'
-    
-class DishUpdateView(LoginRequiredMixin, UpdateView):
-    
-    model = models.Dish
-    template_name = "dish/dish_update.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        dishes = context['dishes']
+
+        latest_prices = {}
+        for dish in dishes:
+            latest_price = DishPrice.objects.filter(dish=dish).order_by('-date').first()
+            latest_prices[dish.id] = latest_price
+
+        context['latest_prices'] = latest_prices
+        return context
+
+    def get(self, request): 
+        super().get(request) 
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest': 
+            return render (request, 'dish/list.html', context=self.get_context_data()) 
+        return render(request, self.template_name, context=self.get_context_data())
+
+class DishCreateView(CreateView):
+    model = Dish
     form_class = DishForm
-    success_url = reverse_lazy("dish-detail")
+    template_name = 'dish/dish_form.html'
+    success_url = reverse_lazy('dish-list')
     
-class DishDeleteView(LoginRequiredMixin, DeleteView):
+
+class DishDetailView(DetailView):
+    model = Dish
+    template_name = 'dish/dish_detail.html' 
+    context_object_name = 'dish'  
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        dish = self.object  
+        latest_price = DishPrice.objects.filter(dish=dish).order_by('-date').first()
+        context['latest_price'] = latest_price  
+        return context
+
+class DishUpdateView(UpdateView):
+    model = Dish
+    form_class = DishForm
+    template_name = 'dish/dish_form.html'
+    success_url = reverse_lazy('dish-list')   
+
+class DishDeleteView(DeleteView):
+    model = Dish
+    template_name = 'dish/dish_confirm_delete.html'
+    success_url = reverse_lazy('dish-list')
     
-    model = models.Dish
-    template_name = "dish/dish_confirm_delete.html"
-    success_url = reverse_lazy("dish-list")
     
-    
-    
+
+
     
 class TableCreateView(LoginRequiredMixin, CreateView):
     
-    model = models.Table
+    model = Table
     template_name = "table/table_form.html"
     form_class = TableForm
     success_url = reverse_lazy("table-list")
     
 class TableListView(ListView):
     
-    model = models.Table
+    model = Table
     template_name = "table/table_list.html"
     context_object_name = "tables"
+    paginate_by = 4
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tables = context['tables']
+
+        latest_prices = {}
+        for table in tables:
+            latest_price = TablePrice.objects.filter(table=table).order_by('-date').first()
+            latest_prices[table.id] = latest_price
+
+        context['latest_prices'] = latest_prices
+        return context
+    
+    def get(self, request): 
+        super().get(request) 
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest': 
+            return render (request, 'table/list.html', context=self.get_context_data()) 
+        return render(request, self.template_name, context=self.get_context_data())
     
 class TableDetailView(DetailView):
     
-    model = models.Table
+    model = Table
     template_name = "table/table_detail.html"
     context_object_name = 'table'
     
-class TableUpdateView(LoginRequiredMixin, UpdateView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        table = self.object  
+        latest_price = TablePrice.objects.filter(table=table).order_by('-date').first()
+        context['latest_price'] = latest_price  
+        return context
     
-    model = models.Table
-    template_name = "table/table_update.html"
+class TableUpdateView(LoginRequiredMixin, UpdateView):
+    model = Table
+    template_name = "table/table_form.html"
     form_class = TableForm
-    success_url = reverse_lazy("table-detail")
+
+    def get_success_url(self):
+        return reverse('table-detail', kwargs={'pk': self.object.pk})
     
 class TableDeleteView(LoginRequiredMixin, DeleteView):
     
-    model = models.Table
+    model = Table
     template_name = "table/table_confirm_delete.html"
     success_url = reverse_lazy("table-list")
     
     
 
 class DishPriceCreateView(LoginRequiredMixin, CreateView):
-    
-    model = models.DishPrice
+    model = DishPrice
     template_name = "dish_price/dish_price_form.html"
     form_class = DishPriceForm
-    success_url = reverse_lazy("dish-price-list")
+
+    def get_success_url(self):
+        return reverse_lazy("dish-detail", kwargs={'pk': self.kwargs['pk']})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['dish'] = Dish.objects.get(pk=self.kwargs['pk'])  
+        return context
+
+    def form_valid(self, form):
+        form.instance.dish_id = self.kwargs['pk']  
+        return super().form_valid(form)
     
-class DishPriceListView(ListView):
+# class DishPriceListView(ListView):
     
-    model = models.DishPrice
-    tamplate_name = "dish_price/dish_price_list.html"
-    context_object_name = "dish_prices"
+#     model = DishPrice
+#     tamplate_name = "dish_price/dish_price_list.html"
+#     context_object_name = "dish_prices"
     
 class DishPriceDetailView(DetailView):
     
-    model = models.DishPrice
+    model = DishPrice
     template_name = "dish_price/dish_price_dateil.html"
     context_object_name = "dish_price"
     
-class DishPriceUpdateView(LoginRequiredMixin, UpdateView):
+# class DishPriceUpdateView(LoginRequiredMixin, UpdateView):
     
-    model = models.DishPrice
-    template_name = "dish_price/dish_price_update.html"    
-    form_class = DishPriceForm
-    success_url = reverse_lazy("dish-price-detail")
+#     model = DishPrice
+#     template_name = "dish_price/dish_price_update.html"    
+#     form_class = DishPriceForm
+#     success_url = reverse_lazy("dish-price-detail")
     
-class DishPriceDeleteView(LoginRequiredMixin, DeleteView):
+# class DishPriceDeleteView(LoginRequiredMixin, DeleteView):
     
-    model = models.DishPrice
-    template_name = "dish_price/dish_price_confirm_delete.html"
-    success_url = reverse_lazy("dish-price-list")
+#     model = DishPrice
+#     template_name = "dish_price/dish_price_confirm_delete.html"
+#     success_url = reverse_lazy("dish-price-list")
 
     
-
-
 class TablePriceCreateView(LoginRequiredMixin, CreateView):
     
-    model = models.TablePrice
+    model = TablePrice
     template_name = "table_price/table_price_form.html"
     form_class = TablePriceForm
-    success_url = reverse_lazy("table-price-list")
     
-class TablePriceListView(ListView):
+    def get_success_url(self):
+        return reverse_lazy("table-detail", kwargs={'pk': self.kwargs['pk']})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['table'] = Table.objects.get(pk=self.kwargs['pk'])  
+        return context
+
+    def form_valid(self, form):
+        form.instance.table_id = self.kwargs['pk']  
+        return super().form_valid(form)
     
-    model = models.TablePrice
-    template_name = "table_price/table_price_list.html"
-    context_object_name = "table_prices"
+# class TablePriceListView(ListView):
+    
+#     model = TablePrice
+#     template_name = "table_price/table_price_list.html"
+#     context_object_name = "table_prices"
     
 class TablePriceDetailView(DetailView):
     
-    model = models.TablePrice
+    model = TablePrice
     template_name = "table_price/table_price_detail.html"
     context_object_name = "table_price"
     
-class TablePriceUpdateView(LoginRequiredMixin, UpdateView):
+# class TablePriceUpdateView(LoginRequiredMixin, UpdateView):
     
-    model = models.TablePrice
-    template_name = "table_price/table_price_update.html"
-    form_class = TablePriceForm
-    success_url = reverse_lazy("table-price-detail")
+#     model = TablePrice
+#     template_name = "table_price/table_price_update.html"
+#     form_class = TablePriceForm
+#     success_url = reverse_lazy("table-price-detail")
     
-class TablePriceDeleteView(LoginRequiredMixin, DeleteView):
+# class TablePriceDeleteView(LoginRequiredMixin, DeleteView):
     
-    model = models.tablePrice
-    template_name = "table_price/table_price_confirm_delete.html"
-    success_url = reverse_lazy("table-price-list")
+#     model = TablePrice
+#     template_name = "table_price/table_price_confirm_delete.html"
+#     success_url = reverse_lazy("table-price-list")
     
 
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
     
-    model = models.Comment
+    model = Comment
     template_name = "comment/comment_form.html"
     form_class = CommentForm
     success_url = reverse_lazy("dish-detail")
     
 class CommentUpdateView(LoginRequiredMixin, UpdateView):
     
-    model - models.Comment
+    model = Comment
     template_name = "comment/comment_update.html"
     form_class = CommentForm
     success_url = reverse_lazy("dish-detail")
     
 class CommentDeleteView(LoginRequiredMixin, DeleteView):
     
-    model = models.Comment
+    model = Comment
     template_name = "comment/comment_confirm_delete.html"
     success_url = reverse_lazy("dish-detail")
     
@@ -267,21 +346,21 @@ class CommentDeleteView(LoginRequiredMixin, DeleteView):
     
 class StarsCreateView(LoginRequiredMixin, CreateView):
     
-    model = models.Stars
+    model = Stars
     template_name = "stars/stars_form.html"
     form_class = StarsForm
     success_url = reverse_lazy("dish-detail")
     
 class StarsUpdateView(LoginRequiredMixin, UpdateView):
     
-    model = models.Stars
+    model = Stars
     template_name = "stars/stars_update.html"
     form_class = StarsForm
     success_url = reverse_lazy("dish-detail")
     
 class StarsDeleteView(LoginRequiredMixin, DeleteView):
     
-    model = models.Stars
+    model = Stars
     template_name = "stars/stars_confirm_delete.html"
     success_url = reverse_lazy("dish-detail")
     
@@ -289,34 +368,34 @@ class StarsDeleteView(LoginRequiredMixin, DeleteView):
     
 class CheckCreateView(LoginRequiredMixin, CreateView):
     
-    model = models.Check
+    model = Check
     template_name = "check/check_form.html"
     form_class = CheckForm
     success_url = reverse_lazy("dish-list")
     
 class CheckListView(LoginRequiredMixin, ListView):
     
-    model = models.Check
+    model = Check
     template_name = "check/check_list.html"
     context_object_name = "checks"
     
 class CheckDetailView(LoginRequiredMixin, DetailView):
     
-    model = models.Check
+    model = Check
     template_name = "check/check_detail.html"
     form_class = CheckForm
     success_url = reverse_lazy("check-detail")
     
 class CheckUpdateView(LoginRequiredMixin, UpdateView):
     
-    model = models.Check
+    model = Check
     template_name = "check/check_update.html"
     form_class = CheckForm
     success_url = reverse_lazy("check-detail")
     
 class CheckDeleteView(LoginRequiredMixin, DeleteView):
     
-    model = models.Check
+    model = Check
     template_name = "check/check_confirm_delete.html"
     success_url = reverse_lazy("dish-list")
     
@@ -325,34 +404,34 @@ class CheckDeleteView(LoginRequiredMixin, DeleteView):
     
 class OrderCreateView(LoginRequiredMixin, CreateView):
     
-    model = models.Order
+    model = Order
     template_name = "order/order_form.html"
     form_class = OrderForm
     success_url = reverse_lazy("dish-list")
     
 class OrderListView(LoginRequiredMixin, ListView):
     
-    model = models.Order
+    model = Order
     template_name = "order/order_list.html"
     context_object_name = "orders"
     
 class OrderDetailView(LoginRequiredMixin, DetailView):
     
-    model = models.Order
+    model = Order
     template_name = "order/order_detail.html"
     form_class = OrderForm
     success_url = reverse_lazy("order-detail")
     
 class OrderUpdateView(LoginRequiredMixin, UpdateView):
     
-    model = models.Order
+    model = Order
     template_name = "order/order_update.html"
     form_class = OrderForm
     success_url = reverse_lazy("order-detail")
     
-class OrderDeleteView(LoginRequiredMixin, DleteView):
+class OrderDeleteView(LoginRequiredMixin, DeleteView):
     
-    model = models.Order
+    model = Order
     template_name = "order/order_confirm_delete.html"
     success_url = reverse_lazy("dish-list")
     

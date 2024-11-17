@@ -1,0 +1,27 @@
+{% load static%}
+{% load custom_filters %}
+{% for table in page_obj %}
+
+<div class="col-md-3 mb-4">
+    <a href="{% url 'table-detail' table.id %}" style="text-decoration: none;">
+        <div class="card" style="border: 2px solid #00ccff;">
+            {% if table.image %}
+                <img src="{{ table.image.url }}" class="card-img-top" alt="{{ table.name }}">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title" style="color: #123E65;">Name/number: {{ table.name }}</h5>
+                <p class="card-text">Maximal people: {{ table.number_of_people}}</p>
+                <p class="card-text">Sort: {{ table.sort }}</p>
+                <p class="card-text">{{ table.zone }}</p>
+
+                {% with latest_price=latest_prices|get_item:table.id %}
+                    <p class="card-text" style="color: #123E65;">
+                        Price: {% if latest_price %} ${{ latest_price.price }} {% else %} Not available {% endif %}
+                    </p>
+                {% endwith %}
+
+            </div>
+        </div>
+    </a>
+</div>
+{% endfor %}
