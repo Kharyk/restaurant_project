@@ -251,10 +251,10 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="{% url "table-list" %}">Table</a>
-                        </li>
+                        {% comment %} </li>
                         <li class="nav-item">
-                          <a class="nav-link active" href="">Contact</a>
-                      </li>
+                          <a class="nav-link active" href="{% url "contact" %}">Contact</a>
+                      </li> {% endcomment %}
                       <li class="nav-item">
                         <a class="nav-link" href="">LogOut</a>
                     </li>
