@@ -7,7 +7,10 @@ register = template.Library()
 
 @register.filter
 def get_item(dictionary, key):
-    return dictionary.get(key)
+    if isinstance(dictionary, dict):
+        return dictionary.get(key)
+    else:
+        return None 
 
 @register.filter
 def truncate_words(value, arg):

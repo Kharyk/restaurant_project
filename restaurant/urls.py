@@ -104,7 +104,7 @@ urlpatterns = [
 
     # Table Price URLs
     # path('table-prices/', TablePriceListView.as_view(), name='table-price-list'),
-    path('table-prices/create/', TablePriceCreateView.as_view(), name='table-price-create'),
+    path('table/<int:pk>/table-prices/create/', TablePriceCreateView.as_view(), name='table-price-create'),
     path('table-prices/<int:pk>/', TablePriceDetailView.as_view(), name='table-price-detail'),
     # path('table-prices/<int:pk>/update/', TablePriceUpdateView.as_view(), name='table-price-update'),
     # path('table-prices/<int:pk>/delete/', TablePriceDeleteView.as_view(), name='table-price-delete'),

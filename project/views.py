@@ -187,6 +187,18 @@ class TableListView(ListView):
     context_object_name = "tables"
     paginate_by = 4
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tables = context['tables']
+
+        latest_prices = {}
+        for table in tables:
+            latest_price = TablePrice.objects.filter(table=table).order_by('-date').first()
+            latest_prices[table.id] = latest_price
+
+        context['latest_prices'] = latest_prices
+        return context
+    
     def get(self, request): 
         super().get(request) 
         if request.headers.get('x-requested-with') == 'XMLHttpRequest': 
@@ -198,6 +210,13 @@ class TableDetailView(DetailView):
     model = Table
     template_name = "table/table_detail.html"
     context_object_name = 'table'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        table = self.object  
+        latest_price = TablePrice.objects.filter(table=table).order_by('-date').first()
+        context['latest_price'] = latest_price  
+        return context
     
 class TableUpdateView(LoginRequiredMixin, UpdateView):
     model = Table

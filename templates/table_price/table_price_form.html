@@ -10,7 +10,7 @@
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="btn btn-primary">Add Price</button>
-            <a href="{% url 'table-detail' table.id %}" class="btn btn-secondary">Cancel</a>
+            <a href="{% url 'table-list' %}" class="btn btn-secondary">Cancel</a>
         </form>
         
             

@@ -14,13 +14,11 @@
                 <p class="card-text">Sort: {{ table.sort }}</p>
                 <p class="card-text">{{ table.zone }}</p>
 
-                {% for price in table.tableprice_set.all %}
-                    <p class="card-text" style="color: #123E65;">Price: ${{ price.price }}</p>
-                {% endfor %}
-
-                {% if not table.tableprice_set.all %}
-                    <p class="card-text" style="color: #123E65;">Price is not available</p>
-                {% endif %}
+                {% with latest_price=latest_prices|get_item:table.id %}
+                    <p class="card-text" style="color: #123E65;">
+                        Price: {% if latest_price %} ${{ latest_price.price }} {% else %} Not available {% endif %}
+                    </p>
+                {% endwith %}
 
             </div>
         </div>
