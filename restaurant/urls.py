@@ -123,7 +123,9 @@ urlpatterns = [
     path('checks/', CheckListView.as_view(), name='check-list'),
     path('checks/create/', CheckCreateView.as_view(), name='check-create'),
     path('checks/<int:pk>/update/', CheckUpdateView.as_view(), name='check-update'),
+    path('checks/<int:pk>/detail/', CheckDetailView.as_view(), name='check-detail'),
     path('checks/<int:pk>/delete/', CheckDeleteView.as_view(), name='check-delete'),
+    
 
     # Order URLs
     path('orders/', OrderListView.as_view(), name='order-list'),

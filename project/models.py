@@ -93,7 +93,7 @@ class Check(models.Model):
     
     id_client = models.ForeignKey(User, on_delete=models.CASCADE)
     id_table = models.ForeignKey('Table', on_delete=models.CASCADE)  
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True, editable=True)  
     status = models.CharField(max_length=20, choices=STATUS, default="not paid")
 
     def calculate_price(self):

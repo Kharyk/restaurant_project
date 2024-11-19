@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="main-content">
+    <section>
+        <h1 class="text-center">Create Check</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="alert alert-danger">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <form method="post" >
+                {% comment %} {% if check in checkes %}
+                    <a href="{% url 'check-detail' check.pk %}" class="btn btn-info">View Details</a>
+                {% else %}
+                    <span class="text-muted">No details available</span>
+                {% endif %} {% endcomment %}
+                <button type="submit" class="btn btn-success">Save Changes</button>
+                <a href="{% url 'table-list' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+
+        
+            
+        </form>
+    </section>
+</main>
+{% endblock %}

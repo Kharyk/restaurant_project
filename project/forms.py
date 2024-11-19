@@ -59,11 +59,11 @@ class StarsForm(forms.Form):
         model = Stars
         fields = ("id_client", 'id_dish','stars', 'date')
         
-class CheckForm(forms.Form):
+class CheckForm(forms.ModelForm):
     
     class Meta:
         model = Check
-        fields = ("id_client", 'id_table', 'date', 'status')
+        fields = ["id_client", 'id_table',  'status']
         
 class OrderForm(forms.Form):
     

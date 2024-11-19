@@ -371,7 +371,7 @@ class CheckCreateView(LoginRequiredMixin, CreateView):
     model = Check
     template_name = "check/check_form.html"
     form_class = CheckForm
-    success_url = reverse_lazy("dish-list")
+    success_url = reverse_lazy("table-list")
     
 class CheckListView(LoginRequiredMixin, ListView):
     
@@ -408,6 +408,28 @@ class OrderCreateView(LoginRequiredMixin, CreateView):
     template_name = "order/order_form.html"
     form_class = OrderForm
     success_url = reverse_lazy("dish-list")
+    
+    # def form_valid(self, form):
+    #     form.instance.id_client = self.request.user
+    #     return super().form_valid(form)
+
+    # def post(self, request, *args, **kwargs):
+    #     if request.method == 'POST':
+    #         form = self.form_class(request.POST)
+    #         if form.is_valid():
+    #             form.instance.id_client = self.request.user
+    #             form.save()
+    #             return redirect(self.success_url)
+    #         else:
+    #             return render(request, self.template_name, {'form': form})
+    #     else:
+    #         form = self.form_class()
+    #         return render(request, self.template_name, {'form': form})
+
+    # def get(self, request, *args, **kwargs):
+    #     form = self.form_class()
+    #     return render(request, self.template_name, {'form': form})
+
     
 class OrderListView(LoginRequiredMixin, ListView):
     
