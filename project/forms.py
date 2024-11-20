@@ -65,8 +65,8 @@ class CheckForm(forms.ModelForm):
         model = Check
         fields = ["id_client", 'id_table',  'status']
         
-class OrderForm(forms.Form):
+class OrderForm(forms.ModelForm):
     
     class Meta:
         model = Order
-        fields = ("id_client", 'id_dishes', 'id_dishesprice', 'id_table', "id_check", "number",  "date")
+        fields = ["id_client", 'id_dishes', 'id_dishesprice', 'id_table', "id_check", "number"]

@@ -407,7 +407,11 @@ class OrderCreateView(LoginRequiredMixin, CreateView):
     model = Order
     template_name = "order/order_form.html"
     form_class = OrderForm
-    success_url = reverse_lazy("dish-list")
+    def form_valid(self, form):
+        self.object = form.save()  # Save the form and get the object
+        self.success_url = reverse_lazy("order-detail", kwargs={'pk': self.object.pk})  # Set success_url here
+        return super().form_valid(form)
+   
     
     # def form_valid(self, form):
     #     form.instance.id_client = self.request.user
@@ -438,18 +442,38 @@ class OrderListView(LoginRequiredMixin, ListView):
     context_object_name = "orders"
     
 class OrderDetailView(LoginRequiredMixin, DetailView):
-    
     model = Order
     template_name = "order/order_detail.html"
     form_class = OrderForm
-    success_url = reverse_lazy("order-detail")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order = self.object
+        
+        # Get the dish prices
+        dish_prices = []
+        for dish in order.id_dishes.all():
+            latest_price = DishPrice.objects.filter(dish=dish).order_by('-date').first()
+            if latest_price:
+                dish_prices.append({
+                    'dish': dish,
+                    'price': latest_price.price,
+                    'quantity': order.number,  # Assuming order.number is the quantity for all dishes
+                    'total_price': latest_price.price * order.number
+                })
+        
+        context['dish_prices'] = dish_prices
+        return context
+    
     
 class OrderUpdateView(LoginRequiredMixin, UpdateView):
     
     model = Order
     template_name = "order/order_update.html"
     form_class = OrderForm
-    success_url = reverse_lazy("order-detail")
+    
+    def get_success_url(self):
+        return reverse('order-detail', kwargs={'pk': self.object.pk})
     
 class OrderDeleteView(LoginRequiredMixin, DeleteView):
     

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load custom_filters%}
+{% load static %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h2 class="mb-0">Update Order</h2>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            {{ form.non_field_errors }}
+                            
+                            <div class="mb-3">
+                                <label for="id_client" class="form-label">Client</label>
+                                {{ form.id_client|add_class:"form-select" }}
+                                {{ form.id_client.errors }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_table" class="form-label">Table</label>
+                                {{ form.id_table|add_class:"form-select" }}
+                                {{ form.id_table.errors }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_dishes" class="form-label">Dishes</label>
+                                {{ form.id_dishes|add_class:"form-select" }}
+                                {{ form.id_dishes.errors }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="number" class="form-label">Quantity</label>
+                                {{ form.number|add_class:"form-control" }}
+                                {{ form.number.errors }}
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary">Update Order</button>
+                                <a href="{% url 'order-detail' order.pk %}" class="btn btn-secondary ms-2">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="{% static 'js/comment.js' %}"></script>
+{% endblock %}
