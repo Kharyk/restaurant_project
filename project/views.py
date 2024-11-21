@@ -383,6 +383,18 @@ class CheckListView(LoginRequiredMixin, ListView):
     template_name = "check/check_list.html"
     context_object_name = "checks"
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        checks = context['checks']
+        
+        return context
+    
+    def get(self, request): 
+        super().get(request) 
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest': 
+            return render (request, 'check/list.html', context=self.get_context_data()) 
+        return render(request, self.template_name, context=self.get_context_data())
+    
 class CheckDetailView(LoginRequiredMixin, DetailView):
     
     model = Check

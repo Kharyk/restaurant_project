@@ -1,0 +1,18 @@
+{% load static%}
+{% load custom_filters %}
+{% for check in checks %}
+<div class="col-md-3 mb-4">
+    <a href="{% url 'check-detail' check.id %}" style="text-decoration: none;">
+        <div class="card" style="border: 2px solid #00ccff;">
+            
+            <div class="card-body">
+                <h5 class="card-title" style="color: #123E65;">{{ check.id }}</h5>
+                <p class="card-text" style="color: #1a4990;">{{ check.id_client }}</p>
+                <p class="card-text" style="color: #1a4990;">{{ check.id_table }}</p>
+                <p class="card-text" style="color: #1a4990;">{{ check.date }}</p>
+                <p class="card-text" style="color: #1a4990;">{{ check.orders.all }}</p>
+            </div>
+        </div>
+    </a>
+</div>
+{% endfor %}

@@ -45,6 +45,18 @@
                                 <h5 class="card-text" style="color: #123E65;">Price: Not available</h5>
                             {% endif %}
                         </div>
+
+                        <div class='col-md-4'>
+                            <br>
+                            Dishes:
+                            {% for order in check.orders.all %}
+                            
+                                {% for dish in order.id_dishes.all%}
+                                    {{dish.name}}
+                                {%endfor%}
+
+                            {% endfor %}
+                        </div>
                             
 
                         <br>
