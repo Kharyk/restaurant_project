@@ -395,12 +395,51 @@ class CheckListView(LoginRequiredMixin, ListView):
             return render (request, 'check/list.html', context=self.get_context_data()) 
         return render(request, self.template_name, context=self.get_context_data())
     
+
+
+
 class CheckDetailView(LoginRequiredMixin, DetailView):
-    
     model = Check
     template_name = "check/check_detail.html"
-    form_class = CheckForm
-    success_url = reverse_lazy("check-detail")
+    context_object_name = "check"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        check = self.object  # The current Check instance
+
+        # Initialize orders and total price
+        orders = []
+        total_price = 0
+
+        # Fetch related orders and calculate prices
+        for order in check.orders.all():
+            for dish in order.id_dishes.all():
+                latest_price = DishPrice.objects.filter(dish=dish, date__lte=check.date).order_by('-date').first()
+                price = latest_price.price if latest_price else 0
+                quantity = order.number
+                total = price * quantity
+                orders.append({
+                    'dish': dish.name,
+                    'quantity': quantity,
+                    'price': price,
+                    'total': total,
+                })
+                total_price += total
+
+        # Add table price if applicable
+        latest_table_price = TablePrice.objects.filter(table=check.id_table, date__lte=check.date).order_by('-date').first()
+        if latest_table_price:
+            total_price += latest_table_price.price
+            context["table_price"] = latest_table_price.price
+        else:
+            context["table_price"] = 0
+
+        # Add calculated data to the context
+        context["orders"] = orders
+        context["total_price"] = total_price
+        return context
+
+
     
 class CheckUpdateView(LoginRequiredMixin, UpdateView):
     

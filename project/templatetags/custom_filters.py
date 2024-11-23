@@ -23,3 +23,12 @@ def truncate_words(value, arg):
 @register.filter
 def add_class(field, css_class):
     return field.as_widget(attrs={"class": css_class})
+
+
+@register.filter
+def multiply(value, arg):
+    try:
+        return float(value) * float(arg)
+    except (ValueError, TypeError):
+        return None
+

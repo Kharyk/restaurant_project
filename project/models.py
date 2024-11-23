@@ -165,8 +165,6 @@ class Check(models.Model):
 class Order(models.Model):
     id_client = models.ForeignKey(User, on_delete=models.CASCADE)
     id_dishes = models.ManyToManyField(Dish, blank=True) 
-    id_dishesprice = models.ManyToManyField(DishPrice, blank=True) 
-    id_table = models.ForeignKey(Table, on_delete=models.CASCADE, blank=True) 
     id_check = models.ForeignKey(Check, on_delete=models.CASCADE, blank=True, null=True, related_name="orders")
     number = models.IntegerField()  
     date = models.DateTimeField(auto_now_add=True)
