@@ -64,9 +64,17 @@ class LoginView(View):
 
 
 class CustomLogoutView(LogoutView):
-
     def get(self, request):
         return super().get(request)
+    template_name = "home.html"
+    success_url = reverse_lazy('home')
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+        else:
+            return redirect('home')
+        
 
 class SignupView(View):
     template_name = 'signup.html'
@@ -377,23 +385,14 @@ class CheckCreateView(LoginRequiredMixin, CreateView):
         self.success_url = reverse_lazy("check-detail", kwargs={'pk': self.object.pk})  
         return super().form_valid(form)
     
-class CheckListView(LoginRequiredMixin, ListView):
-    
+from django.db.models import OuterRef, Subquery
+
+class CheckListView(ListView):
     model = Check
     template_name = "check/check_list.html"
     context_object_name = "checks"
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        checks = context['checks']
-        
-        return context
-    
-    def get(self, request): 
-        super().get(request) 
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest': 
-            return render (request, 'check/list.html', context=self.get_context_data()) 
-        return render(request, self.template_name, context=self.get_context_data())
+
+
     
 
 
@@ -455,40 +454,40 @@ class CheckDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy("dish-list")
     
     
-    
-    
+
+
+
+
 class OrderCreateView(LoginRequiredMixin, CreateView):
-    
     model = Order
-    template_name = "order/order_form.html"
     form_class = OrderForm
-    
+    template_name = 'order/order_form.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
-        self.object = form.save()  
-        self.success_url = reverse_lazy("order-detail", kwargs={'pk': self.object.pk})  
+        dish = get_object_or_404(Dish, pk=self.kwargs['pk'])
+        
+        form.instance.id_client = self.request.user
+        
+        self.object = form.save(commit=False)
+        
+        self.object.save() 
+        self.object.id_dishes.add(dish)  
+        
+        self.success_url = reverse_lazy("check-list")
+        
         return super().form_valid(form)
-   
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['dish'] = get_object_or_404(Dish, pk=self.kwargs['pk'])
+        return context
+
     
-    # def form_valid(self, form):
-    #     form.instance.id_client = self.request.user
-    #     return super().form_valid(form)
-
-    # def post(self, request, *args, **kwargs):
-    #     if request.method == 'POST':
-    #         form = self.form_class(request.POST)
-    #         if form.is_valid():
-    #             form.instance.id_client = self.request.user
-    #             form.save()
-    #             return redirect(self.success_url)
-    #         else:
-    #             return render(request, self.template_name, {'form': form})
-    #     else:
-    #         form = self.form_class()
-    #         return render(request, self.template_name, {'form': form})
-
-    # def get(self, request, *args, **kwargs):
-    #     form = self.form_class()
-    #     return render(request, self.template_name, {'form': form})
 
     
 class OrderListView(LoginRequiredMixin, ListView):
@@ -506,7 +505,6 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         order = self.object
         
-        # Get the dish prices
         dish_prices = []
         for dish in order.id_dishes.all():
             latest_price = DishPrice.objects.filter(dish=dish).order_by('-date').first()
@@ -514,7 +512,7 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
                 dish_prices.append({
                     'dish': dish,
                     'price': latest_price.price,
-                    'quantity': order.number,  # Assuming order.number is the quantity for all dishes
+                    'quantity': order.number, 
                     'total_price': latest_price.price * order.number
                 })
         

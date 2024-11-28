@@ -276,18 +276,29 @@
                             <a class="nav-link active" href="{% url "table-list" %}">Table</a>
                         </li>
                         <li class="nav-item">
-                          <a class="nav-link active" href="{% url "check-list" %}">Check</a>
+                          <a class="nav-link active" href="{% if user.check_set.exists %}{% url 'check-list' %}{% else %}{% url 'check-create' %}{% endif %}">Check</a>
                         </li>
-                        <li class="nav-item">
+                        {% comment %} <li class="nav-item">
                           <a class="nav-link active" href="{% url "order-create" %}">Order</a>
-                        </li>
+                        </li> {% endcomment %}
                         {% comment %} </li>
                         <li class="nav-item">
                           <a class="nav-link active" href="{% url "contact" %}">Contact</a>
                       </li> {% endcomment %}
-                      <li class="nav-item">
-                        <a class="nav-link" href="">LogOut</a>
-                    </li>
+                      
+                      {% if user.is_authenticated %}
+                          <li class="nav-item">
+                            <a class="nav-link" href="{% url "logout" %}">LogOut</a>
+                          </li>
+                      {% else %}
+                          <li class="nav-item">
+                            <a class="nav-link" href="{% url "login" %}">LogIn</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="{% url "signup" %}">SignUp</a>
+                          </li>
+                      {% endif %}
+
                     </ul>
                     <form class="d-flex" role="search" action="" method="get">
                       {% csrf_token %}

@@ -6,9 +6,11 @@
 <main class="main-content">
     <section>
         <h1 class="text-center">Add Price for table {{ table.name }}</h1>
+        <br>
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
+            <br>
             <button type="submit" class="btn btn-primary">Add Price</button>
             <a href="{% url 'table-list' %}" class="btn btn-secondary">Cancel</a>
         </form>

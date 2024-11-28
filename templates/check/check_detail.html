@@ -46,11 +46,18 @@
 
                     <div class="d-flex justify-content-end mt-3">
                         {% if user.is_authenticated %}
-                        <div class="btn-group">
-                            <a href="{% url 'check-update' check.id %}" class="btn btn-sm btn-primary">Edit</a>
-                            <a href="{% url 'check-delete' check.id %}" class="btn btn-sm btn-secondary">Delete</a>
-                        </div>
+                            {% if user.is_staff %}
+
+                            <div class="btn-group">
+                                <a href="{% url 'check-update' check.id %}" class="btn btn-sm btn-primary">Edit</a>
+                                <a href="{% url 'check-delete' check.id %}" class="btn btn-sm btn-secondary">Delete</a>
+                            </div>
+                            {% endif %}
+
                         {% endif %}
+                        <div class="btn-group">
+                            <a href="" class="btn btn-sm btn-primary">Pay</a>
+                        </div>
                     </div>
                 </div>
             </div>

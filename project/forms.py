@@ -65,8 +65,15 @@ class CheckForm(forms.ModelForm):
         model = Check
         fields = ["id_client", 'id_table',  'status']
         
+
 class OrderForm(forms.ModelForm):
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields['id_check'].queryset = Check.objects.filter(id_client=user)
     
     class Meta:
         model = Order
-        fields = ["id_client", 'id_dishes', "id_check", "number"]
+        fields = ["id_check", "number"]
