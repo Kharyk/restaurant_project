@@ -93,7 +93,7 @@ class Check(models.Model):
     
     id_client = models.ForeignKey(User, on_delete=models.CASCADE)
     id_table = models.ForeignKey('Table', on_delete=models.CASCADE)  
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True, editable=True)  
     status = models.CharField(max_length=20, choices=STATUS, default="not paid")
 
     def calculate_price(self):
@@ -163,11 +163,22 @@ class Check(models.Model):
        
 
 class Order(models.Model):
-    
     id_client = models.ForeignKey(User, on_delete=models.CASCADE)
     id_dishes = models.ManyToManyField(Dish, blank=True) 
-    id_dishesprice = models.ManyToManyField(DishPrice, blank=True) 
-    id_table = models.ForeignKey(Table, on_delete=models.CASCADE, blank=True) 
     id_check = models.ForeignKey(Check, on_delete=models.CASCADE, blank=True, null=True, related_name="orders")
     number = models.IntegerField()  
     date = models.DateTimeField(auto_now_add=True)
+
+    def get_dish_prices(self):
+        dish_prices = []
+        for dish in self.id_dishes.all():
+            # Get the latest price for the dish based on the order date
+            latest_price = DishPrice.objects.filter(dish=dish, date__lte=self.date).order_by('-date').first()
+            if latest_price:
+                dish_prices.append({
+                    'dish_name': dish.name,
+                    'price': latest_price.price,
+                    'quantity': self.number,
+                    'total_price': latest_price.price * self.number
+                })
+        return dish_prices

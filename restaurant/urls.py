@@ -123,11 +123,13 @@ urlpatterns = [
     path('checks/', CheckListView.as_view(), name='check-list'),
     path('checks/create/', CheckCreateView.as_view(), name='check-create'),
     path('checks/<int:pk>/update/', CheckUpdateView.as_view(), name='check-update'),
+    path('checks/<int:pk>', CheckDetailView.as_view(), name='check-detail'),
     path('checks/<int:pk>/delete/', CheckDeleteView.as_view(), name='check-delete'),
+    
 
     # Order URLs
     path('orders/', OrderListView.as_view(), name='order-list'),
-    path('orders/create/', OrderCreateView.as_view(), name='order-create'),
+    path('orders/create/<int:pk>', OrderCreateView.as_view(), name='order-create'),
     path('orders/<int:pk>/', OrderDetailView.as_view(), name='order-detail'),
     path('orders/<int:pk>/update/', OrderUpdateView.as_view(), name='order-update'),
     path('orders/<int:pk>/delete/', OrderDeleteView.as_view(), name='order-delete'),

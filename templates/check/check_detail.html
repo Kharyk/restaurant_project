@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white text-center">
+                    <p>Order Check Details</p>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Client:</strong> {{ check.id_client.username }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Table:</strong> {{ check.id_table.name }}</p>
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4">Order Details:</h5>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Dish</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>{{ order.dish }}</td>
+                                <td>{{ order.quantity }}</td>
+                                <td>${{ order.price|floatformat:2 }}</td>
+                                <td>${{ order.total|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <h6 class="text-end">Table Price: ${{ table_price|floatformat:2 }}</h6>
+                    <h5 class="text-end text-success">Total Price: ${{ total_price|floatformat:2 }}</h5>
+
+                    <div class="d-flex justify-content-end mt-3">
+                        {% if user.is_authenticated %}
+                            {% if user.is_staff %}
+
+                            <div class="btn-group">
+                                <a href="{% url 'check-update' check.id %}" class="btn btn-sm btn-primary">Edit</a>
+                                <a href="{% url 'check-delete' check.id %}" class="btn btn-sm btn-secondary">Delete</a>
+                            </div>
+                            {% endif %}
+
+                        {% endif %}
+                        <div class="btn-group">
+                            <a href="" class="btn btn-sm btn-primary">Pay</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="{% static 'js/show_more.js' %}"></script>
+{% endblock %}

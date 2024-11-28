@@ -1,0 +1,44 @@
+{% load static %}
+{% load custom_filters %}
+
+<div class="container mt-5">
+    
+    {% for check in checks %}
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <a href="{% url 'check-detail' check.id %}" style="text-decoration: none;">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white text-center">
+                            <p>Check: {{ check.id }}</p>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p><strong>Client:</strong> {{ check.id_client.username }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Table:</strong> {{ check.id_table.name }}</p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+                                    <p><strong>Date:</strong> {{ check.date|date:"Y-m-d H:i:s" }}</p>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-12">
+                                    <p><strong>Status:</strong> {{ check.get_status_display }}</p>
+                                </div>
+                            </div>
+                            <h5 class="text-end text-success">Total Price: ${{ check.calculate_price|floatformat:2 }}</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-center">No checks available.</p>
+    {% endfor %}
+   
+</div>

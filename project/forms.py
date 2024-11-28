@@ -59,14 +59,26 @@ class StarsForm(forms.Form):
         model = Stars
         fields = ("id_client", 'id_dish','stars', 'date')
         
-class CheckForm(forms.Form):
+class CheckForm(forms.ModelForm):
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
     
     class Meta:
         model = Check
-        fields = ("id_client", 'id_table', 'date', 'status')
+        fields = ['id_table']
         
-class OrderForm(forms.Form):
+
+class OrderForm(forms.ModelForm):
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields['id_check'].queryset = Check.objects.filter(id_client=user)
     
     class Meta:
         model = Order
-        fields = ("id_client", 'id_dishes', 'id_dishesprice', 'id_table', "id_check", "number",  "date")
+        fields = ["id_check", "number"]

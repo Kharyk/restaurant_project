@@ -10,15 +10,15 @@
                         <h2 class="mb-0">{{ dish.name }}</h2>
                     </div>
                     <div class="card-body">
-                        <p class="text-muted">{{ dish.ingredients }}</p>
-                        <p class="text-muted">Gram: {{ dish.gram }} gr</p>
-                        <div class="image-container">
+                        <div class="image-container d-flex align-items-start">
                             {% if dish.image %}
-                                <img src="{{ dish.image.url }}" alt="Dish image" class='image'>
+                                <img src="{{ dish.image.url }}" alt="Dish image" class="image">
                             {% endif %}
+                            <div class="text-container ms-3">
+                                <p class="text-muted">{{ dish.ingredients }}</p>
+                                
+                            </div>
                         </div>
-
-                    
 
                         <div class="row mb-3">
                             <div class="col-md-6">
@@ -45,12 +45,16 @@
 
                                     >{{ dish.sort }}</span>
                             </div>
-
                             <div class="col-md-6">
+                                <br>
+                                <p class="mb-0">Gram: {{ dish.gram }} gr</p>
+                            </div>
+                            <div class="col-md-6">
+                                <br>
                                 {% if latest_price %}
-                                    <p class="card-text" style="color: #123E65;">Price: ${{ latest_price.price }}</p>
+                                    <h5 class="card-text" style="color: #123E65;">Price: ${{ latest_price.price }}</h5>
                                 {% else %}
-                                    <p class="card-text" style="color: #123E65;">Price: Not available</p>
+                                    <h5 class="card-text" style="color: #123E65;">Price: Not available</h5>
                                 {% endif %}
                                 
                             </div>
@@ -117,5 +121,5 @@
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="{% static 'js/comment.js' %}"></script>
+    <script src="{% static 'js/show_more.js' %}"></script>
 {% endblock %}

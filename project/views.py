@@ -19,6 +19,8 @@ from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from django.db.models import OuterRef, Subquery
+
 
 
 class SearchResultsView(View):
@@ -64,9 +66,17 @@ class LoginView(View):
 
 
 class CustomLogoutView(LogoutView):
-
     def get(self, request):
         return super().get(request)
+    template_name = "home.html"
+    success_url = reverse_lazy('home')
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+        else:
+            return redirect('home')
+        
 
 class SignupView(View):
     template_name = 'signup.html'
@@ -366,25 +376,83 @@ class StarsDeleteView(LoginRequiredMixin, DeleteView):
     
     
     
+
 class CheckCreateView(LoginRequiredMixin, CreateView):
-    
     model = Check
     template_name = "check/check_form.html"
     form_class = CheckForm
-    success_url = reverse_lazy("dish-list")
+
+    def form_valid(self, form):
+        # Create the Check instance but don't save it yet
+        self.object = form.save(commit=False)
+        # Set the client (user) who is creating the check
+        self.object.id_client = self.request.user
+        # Save the Check instance to the database
+        self.object.save()
+        # Set the success URL to redirect to the check detail page
+        self.success_url = reverse_lazy("check-detail", kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
+
+    def get_form_kwargs(self):
+        # Get the default form kwargs
+        kwargs = super().get_form_kwargs()
+        # Add the user to the kwargs for filtering in the form
+        kwargs['user'] = self.request.user
+        return kwargs
     
-class CheckListView(LoginRequiredMixin, ListView):
-    
+
+class CheckListView(ListView):
     model = Check
     template_name = "check/check_list.html"
     context_object_name = "checks"
+
+
     
+
+
+
 class CheckDetailView(LoginRequiredMixin, DetailView):
-    
     model = Check
     template_name = "check/check_detail.html"
-    form_class = CheckForm
-    success_url = reverse_lazy("check-detail")
+    context_object_name = "check"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        check = self.object  # The current Check instance
+
+        # Initialize orders and total price
+        orders = []
+        total_price = 0
+
+        # Fetch related orders and calculate prices
+        for order in check.orders.all():
+            for dish in order.id_dishes.all():
+                latest_price = DishPrice.objects.filter(dish=dish, date__lte=check.date).order_by('-date').first()
+                price = latest_price.price if latest_price else 0
+                quantity = order.number
+                total = price * quantity
+                orders.append({
+                    'dish': dish.name,
+                    'quantity': quantity,
+                    'price': price,
+                    'total': total,
+                })
+                total_price += total
+
+        # Add table price if applicable
+        latest_table_price = TablePrice.objects.filter(table=check.id_table, date__lte=check.date).order_by('-date').first()
+        if latest_table_price:
+            total_price += latest_table_price.price
+            context["table_price"] = latest_table_price.price
+        else:
+            context["table_price"] = 0
+
+        # Add calculated data to the context
+        context["orders"] = orders
+        context["total_price"] = total_price
+        return context
+
+
     
 class CheckUpdateView(LoginRequiredMixin, UpdateView):
     
@@ -400,14 +468,41 @@ class CheckDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy("dish-list")
     
     
-    
-    
+
+
+
+
 class OrderCreateView(LoginRequiredMixin, CreateView):
-    
     model = Order
-    template_name = "order/order_form.html"
     form_class = OrderForm
-    success_url = reverse_lazy("dish-list")
+    template_name = 'order/order_form.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        dish = get_object_or_404(Dish, pk=self.kwargs['pk'])
+        
+        form.instance.id_client = self.request.user
+        
+        self.object = form.save(commit=False)
+        
+        self.object.save() 
+        self.object.id_dishes.add(dish)  
+        
+        self.success_url = reverse_lazy("check-list")
+        
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['dish'] = get_object_or_404(Dish, pk=self.kwargs['pk'])
+        return context
+
+    
+
     
 class OrderListView(LoginRequiredMixin, ListView):
     
@@ -416,18 +511,37 @@ class OrderListView(LoginRequiredMixin, ListView):
     context_object_name = "orders"
     
 class OrderDetailView(LoginRequiredMixin, DetailView):
-    
     model = Order
     template_name = "order/order_detail.html"
     form_class = OrderForm
-    success_url = reverse_lazy("order-detail")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order = self.object
+        
+        dish_prices = []
+        for dish in order.id_dishes.all():
+            latest_price = DishPrice.objects.filter(dish=dish).order_by('-date').first()
+            if latest_price:
+                dish_prices.append({
+                    'dish': dish,
+                    'price': latest_price.price,
+                    'quantity': order.number, 
+                    'total_price': latest_price.price * order.number
+                })
+        
+        context['dish_prices'] = dish_prices
+        return context
+    
     
 class OrderUpdateView(LoginRequiredMixin, UpdateView):
     
     model = Order
     template_name = "order/order_update.html"
     form_class = OrderForm
-    success_url = reverse_lazy("order-detail")
+    
+    def get_success_url(self):
+        return reverse('order-detail', kwargs={'pk': self.object.pk})
     
 class OrderDeleteView(LoginRequiredMixin, DeleteView):
     
