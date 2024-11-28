@@ -19,6 +19,8 @@ from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from django.db.models import OuterRef, Subquery
+
 
 
 class SearchResultsView(View):
@@ -374,18 +376,30 @@ class StarsDeleteView(LoginRequiredMixin, DeleteView):
     
     
     
+
 class CheckCreateView(LoginRequiredMixin, CreateView):
-    
     model = Check
     template_name = "check/check_form.html"
     form_class = CheckForm
-    
+
     def form_valid(self, form):
-        self.object = form.save()  
-        self.success_url = reverse_lazy("check-detail", kwargs={'pk': self.object.pk})  
+        # Create the Check instance but don't save it yet
+        self.object = form.save(commit=False)
+        # Set the client (user) who is creating the check
+        self.object.id_client = self.request.user
+        # Save the Check instance to the database
+        self.object.save()
+        # Set the success URL to redirect to the check detail page
+        self.success_url = reverse_lazy("check-detail", kwargs={'pk': self.object.pk})
         return super().form_valid(form)
+
+    def get_form_kwargs(self):
+        # Get the default form kwargs
+        kwargs = super().get_form_kwargs()
+        # Add the user to the kwargs for filtering in the form
+        kwargs['user'] = self.request.user
+        return kwargs
     
-from django.db.models import OuterRef, Subquery
 
 class CheckListView(ListView):
     model = Check

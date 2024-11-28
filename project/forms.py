@@ -61,9 +61,14 @@ class StarsForm(forms.Form):
         
 class CheckForm(forms.ModelForm):
     
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
+    
     class Meta:
         model = Check
-        fields = ["id_client", 'id_table',  'status']
+        fields = ['id_table']
         
 
 class OrderForm(forms.ModelForm):
