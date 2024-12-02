@@ -118,7 +118,7 @@ class LearnMoreView(TemplateView):
 class AboutUsView(TemplateView):
     template_name = 'about_us.html'
 
-class ContactView(LoginRequiredMixin, TemplateView):
+class ContactView(TemplateView):
     template_name = 'contact.html'
     
 

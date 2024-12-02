@@ -21,9 +21,8 @@
     <body class="bg-blue-950 text-white">
     <header class="bg-blue-900 p-4">
     <div class="container mx-auto flex justify-between items-center">
-        <h1 class="text-4xl font-bold">
-        𝐿𝒶 𝐵𝑒𝓁𝓁𝒶 𝐼𝓉𝒶𝓁𝒾𝒶
-        </h1>
+        <a class="navbar-brand text-4xl font-bold text-white" href="{% url "home" %}"> 𝐿𝒶 𝐵𝑒𝓁𝓁𝒶 𝐼𝓉𝒶𝓁𝒾𝒶   </a>
+
         <nav>
         <ul class="flex space-x-4">
         <li>
@@ -46,6 +45,24 @@
             Contact
         </a>
         </li>
+        {% if user.is_authenticated %}
+            <li>
+                <a class="hover:text-yellow-500" href="{% url "logout" %}">
+                    Log out
+                </a>
+            </li>
+            {% else %}
+            <li>
+                <a class="hover:text-yellow-500" href="{% url "login" %}">
+                    Log in
+                </a>
+            </li>
+            <li>
+                <a class="hover:text-yellow-500" href="{% url "signup" %}">
+                    Sign Up
+                </a>
+            </li>
+            {% endif %} 
         </ul>
         </nav>
     </div>
