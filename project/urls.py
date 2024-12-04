@@ -46,6 +46,8 @@ from project.views import (
     OrderUpdateView,
     OrderDeleteView,
     CheckWaiterListView,
+    change_status_pay, 
+    change_status_done
 )
 
 urlpatterns = [
@@ -109,6 +111,9 @@ urlpatterns = [
     
     #Waiter URLs
     path('waiter/checks/', CheckWaiterListView.as_view(), name='waiter-check-list'),
+    path('change-status-pay/<int:check_id>/', change_status_pay, name='change_status_pay'),
+    path('change-status-done/<int:check_id>/', change_status_done, name='change_status_done'),
+
 
     
 

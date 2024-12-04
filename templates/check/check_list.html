@@ -7,9 +7,9 @@
     <div class="container mt-5">
         {% if user.is_authenticated %}
 
-            <div class= 'row text-left poll-container' >
-                {% include  "check/list.html" with checks=user.check_set.all %}
-            </div>
+        <div class='row text-left poll-container'>
+            {% include "check/list.html" %}
+        </div>
             <div class="container">
                 <div class="d-flex justify-content-center">
                     <a href="{% url 'check-create' %}" class="btn btn-secondary">Create a new check</a>

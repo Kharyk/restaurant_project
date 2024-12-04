@@ -277,8 +277,18 @@
                             <a class="nav-link active" href="{% url "table-list" %}">Table</a>
                         </li>
                         <li class="nav-item">
-                          <a class="nav-link active" href="{% if user.is_authenticated %}{% if user.check_set.exists %}{% url 'check-list' %}{% else %}{% url 'check-create' %}{% endif %}{% else %}{% url 'login' %}{% endif %}">Check</a>
-                        </li>
+                          <a class="nav-link active" href="{% if user.is_authenticated %}
+                              {% if user.is_staff %}
+                                  {% url 'waiter-check-list' %}
+                              {% elif user.check_set.exists %}
+                                  {% url 'check-list' %}
+                              {% else %}
+                                  {% url 'check-create' %}
+                              {% endif %}
+                          {% else %}
+                              {% url 'login' %}
+                          {% endif %}">Check</a>
+                      </li>
                         {% comment %} <li class="nav-item">
                           <a class="nav-link active" href="{% url "order-create" %}">Order</a>
                         </li> {% endcomment %}
