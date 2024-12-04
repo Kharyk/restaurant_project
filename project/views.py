@@ -5,8 +5,8 @@ from project.models import Dish, DishPrice, Table, TablePrice, Comment, Stars, O
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.contrib.auth.views import LogoutView
 from project.forms import DishForm, TableForm, DishPriceForm, TablePriceForm, CommentForm, StarsForm, CheckForm, OrderForm
-from django.contrib.auth.mixins import LoginRequiredMixin
-#from project.mixins import 
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from project.mixin import StaffRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
@@ -20,6 +20,8 @@ from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.db.models import OuterRef, Subquery
+
+
 
 
 
@@ -118,7 +120,7 @@ class LearnMoreView(TemplateView):
 class AboutUsView(TemplateView):
     template_name = 'about_us.html'
 
-class ContactView(LoginRequiredMixin, TemplateView):
+class ContactView(TemplateView):
     template_name = 'contact.html'
     
 
@@ -405,10 +407,33 @@ class CheckListView(ListView):
     model = Check
     template_name = "check/check_list.html"
     context_object_name = "checks"
-
-
+    
+    def get_queryset(self):
+        return self.request.user.check_set.filter(
+            Q(status='Want to pay') | Q(status='In process')
+        )
+    
+    
     
 
+
+'''
+def check_list_view(request):
+    if request.user.is_authenticated:
+        unpaid_checks_count = Check.objects.filter(id_client=request.user, status="In process").count()
+        show_create_button = unpaid_checks_count < 5
+        checks = Check.objects.filter(id_client=request.user, status="In process")
+    else:
+        unpaid_checks_count = 0
+        show_create_button = False
+        checks = []
+
+    return render(request, 'check/list.html', {
+        'checks': checks,
+        'unpaid_checks_count': unpaid_checks_count,
+        'show_create_button': show_create_button,
+    })
+'''
 
 
 class CheckDetailView(LoginRequiredMixin, DetailView):
@@ -454,12 +479,64 @@ class CheckDetailView(LoginRequiredMixin, DetailView):
 
 
     
-class CheckUpdateView(LoginRequiredMixin, UpdateView):
-    
+
+
+class CheckUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Check
-    template_name = "check/check_update.html"
-    form_class = CheckForm
-    success_url = reverse_lazy("check-detail")
+    template_name = 'check/check_update.html'
+    fields = ['id_client', 'id_table', 'status']
+
+    def test_func(self):
+        return self.request.user.is_superuser
+
+    def get_success_url(self):
+        return reverse_lazy('check-detail', kwargs={'pk': self.object.id})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        check = self.get_object()
+        context.update({
+            'users': User.objects.all(),
+            'tables': Table.objects.all(),
+            'dishes': Dish.objects.all(),
+            'latest_price': check.id_table.tableprice_set.filter(date__lte=check.date).order_by('-date').first(),
+            'latest_prices': self.get_latest_prices(check),  # Pass the check object to get_latest_prices
+        })
+        return context
+
+    def get_latest_prices(self, check):
+        latest_prices = {}
+        dishes = Dish.objects.all()
+        for dish in dishes:
+            latest_price = DishPrice.objects.filter(dish=dish, date__lte=check.date).order_by('-date').first()
+            latest_prices[dish.id] = latest_price.price if latest_price else 0.00
+        return latest_prices
+
+
+
+    # def get_latest_prices(self):
+    #     latest_prices = {}
+    #     # Get the current check object
+    #     check = self.object
+    #     # Fetch all dishes
+    #     dishes = Dish.objects.all()
+        
+    #     for dish in dishes:
+    #         # Get the latest price for each dish based on the check date
+    #         latest_price = DishPrice.objects.filter(dish=dish, date__lte=check.date).order_by('-date').first()
+    #         latest_prices[dish.id] = latest_price.price if latest_price else 0.00
+        
+    #     return latest_prices
+
+    def form_valid(self, form):
+        # Handle order updates/additions here
+        # You'll need custom logic to update or create new orders
+        # Example: You can access the orders from the form data and update them accordingly
+        # This is a placeholder for your logic
+        orders_data = self.request.POST.getlist('order_data')  # Example of how you might get order data
+        # Process orders_data to update or create orders
+
+        return super().form_valid(form)
     
 class CheckDeleteView(LoginRequiredMixin, DeleteView):
     
@@ -469,6 +546,56 @@ class CheckDeleteView(LoginRequiredMixin, DeleteView):
     
     
 
+class CheckWaiterListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
+    model = Check
+    template_name = "waiter/check_list.html"
+    context_object_name = "checks"
+    
+    def test_func(self):
+        return self.request.user.is_staff
+    
+    def get_queryset(self):
+        # Filter to only include checks with status 'wtp'
+        return Check.objects.filter(status='Want to pay')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['sorts'] = [
+            ("paid", "Paid"),
+            ("wtp", "Want to pay"),
+            ("no paid", "In process")
+        ]
+        return context
+    
+    
+def check_waiter_list_view(request):
+    if not request.user.is_staff:
+        return redirect('login')
+    
+    context = {
+        'check': Check.objects,
+        # other context variables
+    }
+    
+    return render(request, "waiter/check_list.html", context)
+    
+def change_status_pay(request, check_id):
+    check = get_object_or_404(Check, id=check_id)
+    
+    # Change the status to "Want to pay"
+    check.status = "Want to pay"
+    check.save()
+    
+    return JsonResponse({'status': check.status})
+
+def change_status_done(request, check_id):
+    check = get_object_or_404(Check, id=check_id)
+    
+    # Change the status to "Want to pay"
+    check.status = "Paid"
+    check.save()
+    
+    return JsonResponse({'status': check.status})
 
 
 

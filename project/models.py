@@ -88,6 +88,7 @@ class Check(models.Model):
     
     STATUS = [
         ("Paid", "paid"),
+        ("Want to pay", "wtp"),
         ("In process", "not paid")
     ]
     
@@ -142,6 +143,9 @@ class Check(models.Model):
                 dish_names.add(dish.name)  
         
         return list(dish_names) 
+    
+    def get_latest_price(self, date):
+        return self.tableprice_set.filter(date__lte=date).order_by('-date').first()
 
 
         

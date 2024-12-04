@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters%}
+
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white text-center">
+                    <h4>Update Check</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Client</label>
+                                <select name="id_client" class="form-control">
+                                    <option value="{{ check.id_client.id }}" selected>
+                                        {{ check.id_client.username }}
+                                    </option>
+                                    {% for user in users %}
+                                        {% if user != check.id_client %}
+                                            <option value="{{ user.id }}">{{ user.username }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label">Table</label>
+                                <select name="id_table" class="form-control">
+                                    <option value="{{ check.id_table.id }}" selected>
+                                        {{ check.id_table.name }} ({{ check.id_table.zone }} - {{ check.id_table.sort }})
+                                    </option>
+                                    {% for table in tables %}
+                                        {% if table != check.id_table %}
+                                            <option value="{{ table.id }}">
+                                                {{ table.name }} ({{ table.zone }} - {{ table.sort }})
+                                            </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label">Status</label>
+                                <select name="status" class="form-control">
+                                    {% for status_value, status_display in check.STATUS %}
+                                        <option value="{{ status_value }}" 
+                                                {% if status_value == check.status %}selected{% endif %}>
+                                            {{ status_display }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <h5 class="mt-4">Order Details:</h5>
+                        <table class="table table-bordered" id="order-table">
+                            <thead>
+                                <tr>
+                                    <th>Dish</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in check.orders.all %}
+                                    {% for dish in order.id_dishes.all %}
+                                    <tr>
+                                        <td>
+                                            <select name="dish_{{ forloop.parentloop.counter }}" class="form-control">
+                                                <option value="{{ dish.id }}" selected>
+                                                    {{ dish.name }} ({{ dish.sort }})
+                                                </option>
+                                                {% for available_dish in dishes %}
+                                                    {% if available_dish != dish %}
+                                                        <option value="{{ available_dish.id }}">
+                                                            {{ available_dish.name }} ({{ available_dish.sort }})
+                                                        </option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="number" 
+                                                   name="quantity_{{ forloop.parentloop.counter }}" 
+                                                   value="{{ order.number }}" 
+                                                   class="form-control"
+                                                   min="1">
+                                        </td>
+                                        <td>
+                                            ${{ latest_prices.dish.id|default:"0.00"|floatformat:2 }}
+                                        </td>
+                                        <td>
+                                            ${{ latest_prices.dish.id|default:"0.00"|multiply:order.number|floatformat:2 }}
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-danger remove-order">Remove</button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <button type="button" class="btn btn-success" id="add-order">Add Order Item</button>
+                            
+                            <div>
+                                {% if latest_price %}
+                                    <p>Latest Price: {{ latest_price.price }}</p>  
+                                {% else %}
+                                    <p>No price available.</p>
+                                {% endif %}
+
+                                <h5 class="text-success">Total Price: ${{ check.calculate_price|floatformat:2 }}</h5>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="submit" class="btn btn-primary me-2">Save Changes</button>
+                            <a href="{% url 'check-detail' check.id %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('add-order').addEventListener('click', function() {
+    const table = document.getElementById('order-table').getElementsByTagName('tbody')[0];
+    const newRow = table.insertRow();
+    
+    // Dish select
+    const dishCell = newRow.insertCell(0);
+    const dishSelect = document.createElement('select');
+    dishSelect.name = 'new_dish';
+    dishSelect.className = 'form-control';
+    
+    {% for dish in dishes %}
+        const option{{ forloop.counter }} = document.createElement('option');
+        option{{ forloop.counter }}.value = '{{ dish.id }}';
+        option{{ forloop.counter }}.text = '{{ dish.name }} ({{ dish.sort }})';
+        dishSelect.appendChild(option{{ forloop.counter }});
+    {% endfor %}
+    
+    dishCell.appendChild(dishSelect);
+
+    // Quantity input
+    const quantityCell = newRow.insertCell(1);
+    const quantityInput = document.createElement('input');
+    quantityInput.type = 'number';
+    quantityInput.name = 'new_quantity';
+    quantityInput.className = 'form-control';
+    quantityInput.min = '1';
+    quantityInput.value = '1';
+    quantityCell.appendChild(quantityInput);
+
+    // Price and Total placeholders
+    newRow.insertCell(2).textContent = '$0.00';
+    newRow.insertCell(3).textContent = '$0.00';
+
+    // Remove button
+    const actionsCell = newRow.insertCell(4);
+    const removeButton = document.createElement('button');
+    removeButton.textContent = 'Remove';
+    removeButton.className = 'btn btn-sm btn-danger remove-order';
+    removeButton.addEventListener('click', function() {
+        table.deleteRow(newRow.rowIndex - 1);
+    });
+    actionsCell.appendChild(removeButton);
+});
+
+// Remove order item
+document.querySelectorAll('.remove-order').forEach(button => {
+    button.addEventListener('click', function() {
+        this.closest('tr').remove();
+    });
+});
+</script>
+{% endblock %}

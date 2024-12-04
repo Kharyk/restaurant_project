@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+
+{% block content %}
+    <div class="container mt-5">
+        {% if user.is_authenticated %}
+            {% if user.is_staff %}
+                <div class='row text-left poll-container'>
+                    {% include "waiter/list.html" %}
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-3">
+                        <ul class="list-group">
+                            {% for item in check %}
+                                <li class="list-group-item">
+                                    {{ item }} 
+                                    <button class="btn btn-sm btn-primary pay-button" data-check-id="{{ item.id }}" data-toggle="tooltip" title="Pay Check {{ item.id }}">Pay</button>
+                                </li>
+                            {% comment %} {% empty %}
+                                <li class="list-group-item text-muted">No checks available for payment.</li> {% endcomment %}
+                            {% endfor %}    
+                        </ul>   
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="row justify-content-center">
+                <div class="col-md-4 mb-2">
+                    <div class="card" style="border: 2px solid #00ccff;">
+                        <div class="card-body">
+                            <h5 class="text-center">You need to login to use this page</h5>
+                            <br>
+                            <a class="btn btn-primary" href="{% url 'login' %}">Log in</a>
+                            <a class="btn btn-info" href="{% url 'signup' %}">Sign Up</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.querySelectorAll('.pay-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const checkId = this.getAttribute('data-check-id');
+                
+                fetch(`/change-status/${checkId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'  // Ensure you include CSRF token for security
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status) {
+                        alert('Status changed to: ' + data.status);
+                        location.reload(); // Reload the page to see the updated status
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    </script>
+{% endblock %}

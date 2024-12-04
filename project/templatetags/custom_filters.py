@@ -1,8 +1,14 @@
 
-
 from django import template
 
 register = template.Library()
+
+
+@register.filter
+def filter_by_status(queryset, status):
+    if queryset is None:
+        return queryset  # or return an empty queryset if you prefer
+    return queryset.filter(status=status)
 
 
 @register.filter
