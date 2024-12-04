@@ -9,13 +9,10 @@
             <a href="{% url 'check-detail' check.id %}" style="text-decoration: none;">
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-white text-center">
-                        <p>Check: {{ check.id }}</p>
+                        <p><strong>Client </strong> {{ check.id_client.username }} wants to pay check number {{check.id}}</p>
                     </div>
                     <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <p><strong>Client:</strong> {{ check.id_client.username }}</p>
-                            </div>
+                        
                             <div class="col-md-6">
                                 <p><strong>Table:</strong> {{ check.id_table.name }}</p>
                             </div>

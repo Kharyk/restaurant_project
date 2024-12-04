@@ -45,6 +45,7 @@ from project.views import (
     OrderDetailView,
     OrderUpdateView,
     OrderDeleteView,
+    CheckWaiterListView,
 )
 
 urlpatterns = [
@@ -105,6 +106,10 @@ urlpatterns = [
     path('checks/<int:pk>/update/', CheckUpdateView.as_view(), name='check-update'),
     path('checks/<int:pk>', CheckDetailView.as_view(), name='check-detail'),
     path('checks/<int:pk>/delete/', CheckDeleteView.as_view(), name='check-delete'),
+    
+    #Waiter URLs
+    path('waiter/checks/', CheckWaiterListView.as_view(), name='waiter-check-list'),
+
     
 
     # Order URLs

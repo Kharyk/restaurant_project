@@ -405,10 +405,27 @@ class CheckListView(ListView):
     model = Check
     template_name = "check/check_list.html"
     context_object_name = "checks"
-
-
+    
     
 
+
+'''
+def check_list_view(request):
+    if request.user.is_authenticated:
+        unpaid_checks_count = Check.objects.filter(id_client=request.user, status="In process").count()
+        show_create_button = unpaid_checks_count < 5
+        checks = Check.objects.filter(id_client=request.user, status="In process")
+    else:
+        unpaid_checks_count = 0
+        show_create_button = False
+        checks = []
+
+    return render(request, 'check/list.html', {
+        'checks': checks,
+        'unpaid_checks_count': unpaid_checks_count,
+        'show_create_button': show_create_button,
+    })
+'''
 
 
 class CheckDetailView(LoginRequiredMixin, DetailView):
@@ -468,6 +485,14 @@ class CheckDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy("dish-list")
     
     
+
+
+    
+class CheckWaiterListView(LoginRequiredMixin, ListView):
+    model = Check
+    template_name = "waiter/check_list.html"
+    context_object_name = "waiter_checks"
+
 
 
 
