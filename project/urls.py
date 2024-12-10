@@ -1,7 +1,7 @@
 from django.urls import path
 from project import views
 from project.views import (
-    SearchResultsView,
+    # SearchResultsView,
     LoginView,
     CustomLogoutView,
     SignupView,
@@ -36,7 +36,9 @@ from project.views import (
     StarsUpdateView,
     StarsDeleteView,
     CheckCreateView,
-    CheckListView,
+    CheckCurrentListView,
+    CheckInProcessListView,
+    CheckHistoryListView,
     CheckDetailView,
     CheckUpdateView,
     CheckDeleteView,
@@ -47,7 +49,8 @@ from project.views import (
     OrderDeleteView,
     CheckWaiterListView,
     change_status_pay, 
-    change_status_done
+    change_status_done,
+    dish_search
 )
 
 urlpatterns = [
@@ -62,7 +65,7 @@ urlpatterns = [
     path('logout/', CustomLogoutView.as_view(), name='logout'),
     path('signup/', SignupView.as_view(), name='signup'),
 
-    path('search/', SearchResultsView.as_view(), name='search-results'),
+    path('search/', views.dish_search, name='search-results'),
 
     # Dish URLs
     path('dishes/', DishListView.as_view(), name='dish-list'),
@@ -103,7 +106,9 @@ urlpatterns = [
     path('stars/<int:pk>/delete/', StarsDeleteView.as_view(), name='stars-delete'),
 
     # Check URLs
-    path('checks/', CheckListView.as_view(), name='check-list'),
+    path('checks/current/', CheckCurrentListView.as_view(), name='check-current'),
+    path('checks/process/', CheckInProcessListView.as_view(), name='check-process'),
+    path('checks/history', CheckHistoryListView.as_view(), name='check-history'),
     path('checks/create/', CheckCreateView.as_view(), name='check-create'),
     path('checks/<int:pk>/update/', CheckUpdateView.as_view(), name='check-update'),
     path('checks/<int:pk>', CheckDetailView.as_view(), name='check-detail'),

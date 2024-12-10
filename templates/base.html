@@ -258,67 +258,91 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg">
-            <div class="container-fluid">
-                <a class="navbar-brand text-4xl font-bold text-white" href="{% url "home" %}"> 𝐿𝒶 𝐵𝑒𝓁𝓁𝒶 𝐼𝓉𝒶𝓁𝒾𝒶   </a>
-                
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                          <a class="nav-link active" aria-current="page" href=""></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{% url "dish-list" %}">Menu</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="{% url "table-list" %}">Table</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link active" href="{% if user.is_authenticated %}
-                              {% if user.is_staff %}
-                                  {% url 'waiter-check-list' %}
-                              {% elif user.check_set.exists %}
-                                  {% url 'check-list' %}
-                              {% else %}
-                                  {% url 'check-create' %}
-                              {% endif %}
-                          {% else %}
-                              {% url 'login' %}
-                          {% endif %}">Check</a>
-                      </li>
-                        {% comment %} <li class="nav-item">
-                          <a class="nav-link active" href="{% url "order-create" %}">Order</a>
-                        </li> {% endcomment %}
-                        {% comment %} </li>
-                        <li class="nav-item">
-                          <a class="nav-link active" href="{% url "contact" %}">Contact</a>
-                      </li> {% endcomment %}
-                      
-                      {% if user.is_authenticated %}
-                          <li class="nav-item">
-                            <a class="nav-link" href="{% url "logout" %}">LogOut</a>
-                          </li>
-                      {% else %}
-                          <li class="nav-item">
-                            <a class="nav-link" href="{% url "login" %}">LogIn</a>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link" href="{% url "signup" %}">SignUp</a>
-                          </li>
-                      {% endif %}
+      <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand text-4xl font-bold text-white" href="{% url "home" %}"> 𝐿𝒶 𝐵𝑒𝓁𝓁𝒶 𝐼𝓉𝒶𝓁𝒾𝒶 </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url "dish-list" %}">Menu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url "table-list" %}">Table</a>
+                    </li>
 
-                    </ul>
-                    <form class="d-flex" role="search" action="" method="get">
-                      {% csrf_token %}
-                      <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q">
-                      <button class="btn btn-outline-light" type="submit">Search</button>
-                    </form>
-                </div>
+                    {%if user.is_staff or user.is_superuser%}
+                      <li class="nav-item">
+                        <a class="nav-link active" href="{% url "waiter-check-list" %}">Check</a>
+                      </li>
+                    {%else%}  
+                      <li class="nav-item dropdown">
+                          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                              Check
+                          </a>
+                          <ul class="dropdown-menu">
+                              <li>
+                                  <a class="dropdown-item" name="current" value="True" href="{% if user.is_authenticated %}
+                                      
+                                      {% if user.check_set.exists %}
+                                          {% url 'check-current' %}
+                                      {% else %}
+                                          {% url 'check-create' %}
+                                      {% endif %}
+                                  {% else %}
+                                      {% url 'login' %}
+                                  {% endif %}">
+                                      Current
+                                  </a>
+                              </li>
+                              <li><a class="dropdown-item" name="in_process" value="True" href="{% url 'check-process' %}">In Process</a></li>
+                              <li><hr class="dropdown-divider"></li>
+                              <li><a class="dropdown-item" name="history" value="True" href="{% url 'check-history' %}">History</a></li>
+                          </ul>
+                        </li>
+                      {%endif%}
+                    
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url "logout" %}">LogOut</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url "login" %}">LogIn</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url "signup" %}">SignUp</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <form class="d-flex" role="search" action="{% url 'search-results' %}" method="get">
+                  <input class="form-control me-2" type="search" name="q" placeholder="Search dishes..." value="{{ request.GET.q }}">
+                  
+                  <select name="daytime" class="form-select me-2">
+                      <option value="">All Times</option>
+                      {% for value, label in daytime_choices %}
+                          <option value="{{ value }}" {% if request.GET.daytime == value %}selected{% endif %}>
+                              {{ label|title }}
+                          </option>
+                      {% endfor %}
+                  </select>
+                  
+                  <select name="category" class="form-select me-2">
+                      <option value="">All Categories</option>
+                      {% for value, label in category_choices %}
+                          <option value="{{ value }}" {% if request.GET.category == value %}selected{% endif %}>
+                              {{ label|title }}
+                          </option>
+                      {% endfor %}
+                  </select>
+                  
+                  <button class="btn btn-outline-light" type="submit">Search</button>
+              </form>
             </div>
-        </nav>
+        </div>
+    </nav>
     </header>
     
 

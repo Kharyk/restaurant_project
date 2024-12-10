@@ -25,25 +25,39 @@ from django.db.models import OuterRef, Subquery
 
 
 
-class SearchResultsView(View):
-    @method_decorator(login_required)
-    def get(self, request):
-        query = request.GET.get('q')
-        if query:
-            dish = Dish.objects.filter(
-                Q(name__icontains=query) | 
-                Q(ingredients__icontains=query) | 
-                Q(sort__icontains=query)
-            )
-            table = Table.objects.filter(
-                Q(name__icontains=query) | 
-                Q(zone__icontains=query) | 
-                Q(sort__icontains=query)
-            )
-        else:
-            tasks = Dish.objects.none()
-            projects = Table.objects.none()
-        return render(request, 'search_results.html', {'dish': dishs, 'table': tables, 'query': query})
+from django.db.models import Q
+from .models import Dish
+
+def dish_search(request):
+    queryset = Dish.objects.all()
+    
+    query = request.GET.get('q', '')
+    daytime = request.GET.get('daytime', '')
+    category = request.GET.get('category', '')
+    
+    if query:
+        queryset = queryset.filter(
+            Q(name__icontains=query) | 
+            Q(ingredients__icontains=query)
+        )
+    
+    if daytime:
+        queryset = queryset.filter(sort_daytime=daytime)
+    
+    if category:
+        queryset = queryset.filter(sort=category)
+    
+    context = {
+        'dishes': queryset,
+        'query': query,
+        'daytime': daytime,
+        'category': category,
+        'daytime_choices': Dish.SORTDT,
+        'category_choices': Dish.SORT
+    }
+    
+    return render(request, 'search_result.html', context)
+    
 
 class LoginView(View):
     template_name = 'login.html'
@@ -403,17 +417,35 @@ class CheckCreateView(LoginRequiredMixin, CreateView):
         return kwargs
     
 
-class CheckListView(ListView):
+class CheckCurrentListView(ListView):
     model = Check
     template_name = "check/check_list.html"
     context_object_name = "checks"
     
     def get_queryset(self):
         return self.request.user.check_set.filter(
-            Q(status='Want to pay') | Q(status='In process')
+            Q(status='Current')
         )
     
+class CheckInProcessListView(ListView):
+    model = Check
+    template_name = "check/check_list.html"
+    context_object_name = "checks"
     
+    def get_queryset(self):
+        return self.request.user.check_set.filter(
+            Q(status='Want to pay') 
+        )
+        
+class CheckHistoryListView(ListView):
+    model = Check
+    template_name = "check/check_list.html"
+    context_object_name = "checks"
+    
+    def get_queryset(self):
+        return self.request.user.check_set.filter(
+            Q(status='Paid')
+        )
     
 
 

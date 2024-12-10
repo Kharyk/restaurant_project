@@ -87,15 +87,15 @@ class Stars(models.Model):
 class Check(models.Model):
     
     STATUS = [
-        ("Paid", "paid"),
-        ("Want to pay", "wtp"),
-        ("In process", "not paid")
+        ("Paid", "Paid"),
+        ("Want to pay", "Want to pay"),
+        ("Current", "Current")
     ]
     
     id_client = models.ForeignKey(User, on_delete=models.CASCADE)
     id_table = models.ForeignKey('Table', on_delete=models.CASCADE)  
     date = models.DateTimeField(auto_now_add=True, editable=True)  
-    status = models.CharField(max_length=20, choices=STATUS, default="not paid")
+    status = models.CharField(max_length=20, choices=STATUS, default="Current")
 
     def calculate_price(self):
         if not self.id_client or not self.id_table:

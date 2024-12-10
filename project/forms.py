@@ -77,7 +77,7 @@ class OrderForm(forms.ModelForm):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         if user:
-            self.fields['id_check'].queryset = Check.objects.filter(id_client=user)
+            self.fields['id_check'].queryset = Check.objects.filter(id_client=user, status="In process")
     
     class Meta:
         model = Order
