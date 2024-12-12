@@ -399,20 +399,14 @@ class CheckCreateView(LoginRequiredMixin, CreateView):
     form_class = CheckForm
 
     def form_valid(self, form):
-        # Create the Check instance but don't save it yet
         self.object = form.save(commit=False)
-        # Set the client (user) who is creating the check
         self.object.id_client = self.request.user
-        # Save the Check instance to the database
         self.object.save()
-        # Set the success URL to redirect to the check detail page
         self.success_url = reverse_lazy("check-detail", kwargs={'pk': self.object.pk})
         return super().form_valid(form)
 
     def get_form_kwargs(self):
-        # Get the default form kwargs
         kwargs = super().get_form_kwargs()
-        # Add the user to the kwargs for filtering in the form
         kwargs['user'] = self.request.user
         return kwargs
     
@@ -593,9 +587,9 @@ class CheckWaiterListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['sorts'] = [
-            ("paid", "Paid"),
-            ("wtp", "Want to pay"),
-            ("no paid", "In process")
+            ("Paid", "Paid"),
+            ("Want to pay", "Want to pay"),
+            ("Current", "Current")
         ]
         return context
     
@@ -614,16 +608,15 @@ def check_waiter_list_view(request):
 def change_status_pay(request, check_id):
     check = get_object_or_404(Check, id=check_id)
     
-    # Change the status to "Want to pay"
-    check.status = "Want to pay"
-    check.save()
+    if check.status != "Want to pay":
+        check.status = "Want to pay"
+        check.save()
     
-    return JsonResponse({'status': check.status})
+    return JsonResponse({'status': check.status})   
 
 def change_status_done(request, check_id):
     check = get_object_or_404(Check, id=check_id)
     
-    # Change the status to "Want to pay"
     check.status = "Paid"
     check.save()
     
@@ -651,7 +644,7 @@ class OrderCreateView(LoginRequiredMixin, CreateView):
         self.object.save() 
         self.object.id_dishes.add(dish)  
         
-        self.success_url = reverse_lazy("check-list")
+        self.success_url = reverse_lazy("dish-list")
         
         return super().form_valid(form)
 
