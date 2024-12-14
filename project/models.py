@@ -2,6 +2,35 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum, F
 
+class CartOfPrivileges(models.Model):
+    
+    DISCOUNT = [
+        (0.9, '10%'),
+        (0.85, '15%'),
+        (0.7, '30%'),
+    ]
+    
+    id_client = models.ForeignKey(User, on_delete=models.CASCADE)
+    discount = models.DecimalField(max_digits=3, decimal_places=2, choices=DISCOUNT, default= '20%') 
+
+class Allergies(models.Model):
+    
+    name = models.CharField(max_length=50)
+    description = models.TextField(blank=True)
+    
+class LanguageOfCommunication(models.Model):
+    
+    language = models.CharField(max_length=50)
+
+class ExtraInfoUser(models.Model):
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    birthday = models.DateField(auto_now=False, auto_now_add=False)
+    allergies = models.ManyToManyField(Allergies)
+    language_of_communication = models.ManyToManyField(LanguageOfCommunication)
+    discount = models.ManyToManyField(CartOfPrivileges, blank=True)
+
+
 class Dish(models.Model):
     SORTDT = [
         ("Breakfast", "breakfast"),
@@ -24,7 +53,8 @@ class Dish(models.Model):
     gram = models.CharField(max_length=255)
     sort_daytime = models.CharField(max_length=15, choices=SORTDT, blank=True, null=True)
     sort = models.CharField(max_length=50, choices=SORT)
-    image = models.ImageField( upload_to='dish_img/', blank = True, null = True)
+    allergies = models.ManyToManyField(Allergies)
+    image = models.ImageField(upload_to='dish_img/', blank=True, null=True)
     
 
 class Table(models.Model):
@@ -44,7 +74,7 @@ class Table(models.Model):
     number_of_people = models.IntegerField()
     zone = models.CharField(max_length=10, choices=ZONE)
     sort = models.CharField(max_length=20, choices=SORT)
-    image = models.ImageField(upload_to= "table_img/", blank = True, null = True)
+    image = models.ImageField(upload_to="table_img/", blank=True, null=True)
     
 
 class DishPrice(models.Model):
@@ -186,3 +216,6 @@ class Order(models.Model):
                     'total_price': latest_price.price * self.number
                 })
         return dish_prices
+    
+    
+  
