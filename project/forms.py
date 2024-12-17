@@ -82,3 +82,27 @@ class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ["id_check", "number"]
+        
+class CartOfPrivilegesForm(forms.ModelForm):
+    
+    class Meta:
+        model = CartOfPrivileges
+        fields = ["id_client", "discount"]
+                
+class AllergiesForm(forms.ModelForm):
+    
+    class Meta:
+        model = Allergies
+        fields = ["name", "description"]   
+             
+class LanguageOfCommunicationForm(forms.ModelForm):
+    
+    class Meta:
+        model = LanguageOfCommunication
+        fields = ["language"]      
+          
+class ExtraInfoUserForm(forms.ModelForm):
+    
+    class Meta:
+        model = ExtraInfoUser
+        fields = ["user", "birthday", "allergies", "language_of_communication", "discount"]

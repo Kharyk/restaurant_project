@@ -703,6 +703,125 @@ class OrderDeleteView(LoginRequiredMixin, DeleteView):
     
     
     
+class CartOfPrivilegesListView(LoginRequiredMixin, ListView):
+    model = CartOfPrivileges
+    template_name = 'cart_of_privileges_list.html'
+    context_object_name = 'privileges'
+
+    def get_queryset(self):
+        return CartOfPrivileges.objects.filter(id_client=self.request.user)
+
+class CartOfPrivilegesDetailView(LoginRequiredMixin, DetailView):
+    model = CartOfPrivileges
+    template_name = 'cart_of_privileges_detail.html'
+
+class CartOfPrivilegesCreateView(LoginRequiredMixin, CreateView):
+    model = CartOfPrivileges
+    template_name = 'cart_of_privileges_form.html'
+    fields = ['discount']
+
+    def form_valid(self, form):
+        form.instance.id_client = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('cart-privileges-detail', kwargs={'pk': self.object.pk})
+
+class CartOfPrivilegesUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = CartOfPrivileges
+    template_name = 'cart_of_privileges_form.html'
+    fields = ['discount']
+
+    def test_func(self):
+        privilege = self.get_object()
+        return self.request.user == privilege.id_client
+
+    def get_success_url(self):
+        return reverse_lazy('cart-privileges-detail', kwargs={'pk': self.object.pk})
+
+class CartOfPrivilegesDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = CartOfPrivileges
+    template_name = 'cart_of_privileges_confirm_delete.html'
+    success_url = reverse_lazy('cart-privileges-list')
+
+    def test_func(self):
+        privilege = self.get_object()
+        return self.request.user == privilege.id_client
+
+
+
+class AllergiesListView(LoginRequiredMixin, ListView):
+    model = Allergies
+    template_name = 'allergies_list.html'
+    context_object_name = 'allergies'
+
+class AllergiesDetailView(LoginRequiredMixin, DetailView):
+    model = Allergies
+    template_name = 'allergies_detail.html'
+
+class AllergiesCreateView(LoginRequiredMixin, CreateView):
+    model = Allergies
+    template_name = 'allergies_form.html'
+    success_url = reverse_lazy('allergies-list')
+
+class AllergiesDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Allergies
+    template_name = 'allergie_confirm_delete.html'
+    success_url = reverse_lazy('allergies-list')
+
+
+
+class LanguageOfCommunicationListView(LoginRequiredMixin, ListView):
+    model = LanguageOfCommunication
+    template_name = 'language_list.html'
+    context_object_name = 'languages'
     
+class LanguageOfCommunicationDetailView(LoginRequiredMixin, DetailView):
+    model = LanguageOfCommunication
+    template_name = 'language_detail.html'
+
+class LanguageOfCommunicationCreateView(LoginRequiredMixin, CreateView):
+    model = LanguageOfCommunication
+    template_name = 'languages_form.html'
+    success_url = reverse_lazy('language-list')
+
+class LanguageOfCommunicationDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = LanguageOfCommunication
+    template_name = 'language_confirm_delete.html'
+    success_url = reverse_lazy('language-list')
+    
+    
+    
+class ExtraInfoUserCreateView(LoginRequiredMixin, CreateView):
+    model = ExtraInfoUser
+    template_name = 'extra_info_user_form.html'
+    success_url = reverse_lazy('info-detail')
+
+class ExtraInfoUserDetailView(LoginRequiredMixin, DetailView):  
+    model = ExtraInfoUser
+    template_name = 'extra_info_user_detail.html'
+
+    def get_object(self, queryset=None):
+        return ExtraInfoUser.objects.get(user=self.request.user)
+
+class ExtraInfoUserUpdateView(LoginRequiredMixin, UpdateView):
+    model = ExtraInfoUser
+    template_name = 'extra_info_user_form.html'
+
+    def get_object(self, queryset=None):
+        extra_info, created = ExtraInfoUser.objects.get_or_create(user=self.request.user)
+        return extra_info
+
+    def get_success_url(self):
+        return reverse_lazy('extra-info-detail')
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+    
+class ExtraInfoUserDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = ExtraInfoUser
+    template_name = 'extra_info_user_delete.html'
+    success_url = reverse_lazy('dish-list')
 
 # Create your views here.
