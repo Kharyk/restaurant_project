@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container mt-4">
+    
+
+    
+    <div class="container mt-5">
+        {% if dishes %}
+            {% for dish in dishes %}
+                {% if forloop.first or forloop.counter0|divisibleby:4 %}
+                    <div class="row mb-4">
+                {% endif %}
+                
+                <div class="col-md-3 mb-4">
+                    <a href="{% url 'dish-detail' dish.id %}" style="text-decoration: none;">
+                        <div class="card body">
+                            {% if dish.image %}
+                                <img src="{{ dish.image.url }}" class="card-img-top" alt="{{ dish.name }} image">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title" style="color: #123E65;">{{ dish.name }}</h5>
+                                <p class="card-text text-secondary">{{ dish.ingredients|truncate_words:10 }}</p>
+                                <p class="card-text text-secondary">{{ dish.gram }} gr</p>
+                            
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="{% url 'order-create' dish.id %}" class="btn btn-primary">+</a>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                
+                {% if forloop.counter|divisibleby:4 or forloop.last %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No dishes found matching your search criteria.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

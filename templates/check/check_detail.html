@@ -59,7 +59,7 @@
 
                         {% endif %}
                         <div class="btn-group">
-                            {% if check.status == "In process" %}
+                            {% if check.status == "Current" %}
                                 <p class="btn btn-sm btn-primary" id="pay-button" data-check-id="{{ check.id }}">Pay</p>
                             {% endif %}
                             {% if user.is_staff%}
@@ -69,37 +69,41 @@
                             {% endif %}
 
                         </div>
-                        
                         <script>
-                            document.getElementById('pay-button').addEventListener('click', function() {
+                            document.getElementById('pay-button').addEventListener('click', function(event) {
+                                event.preventDefault();
                                 const checkId = this.getAttribute('data-check-id');
                                 
                                 fetch(`/change-status-pay/${checkId}/`, {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
-                                        'X-CSRFToken': '{{ csrf_token }}'  // Ensure you include CSRF token for security
+                                        'X-CSRFToken': '{{ csrf_token }}'
                                     },
                                     body: JSON.stringify({})
                                 })
-                                .then(response => response.json())
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                    }
+                                    return response.json();
+                                })
                                 .then(data => {
                                     if (data.status) {
-                                        alert('Status changed to: ' + data.status);
+                                        alert(`Status changed to: ${data.status}. Wait for the waiter to come to you.`);
                                         // Optionally, update the UI to reflect the new status
                                     }
                                 })
                                 .catch(error => console.error('Error:', error));
                             });
-
-                            
                         </script>
+
                         
 
                         <script>
                             document.getElementById('done-button').addEventListener('click', function() {
                                 const checkId = this.getAttribute('data-check-id');
-                                
+                            
                                 fetch(`/change-status-done/${checkId}/`, {
                                     method: 'POST',
                                     headers: {
@@ -112,6 +116,7 @@
                                 .then(data => {
                                     if (data.status) {
                                         alert('Status changed to: ' + data.status);
+                                        alert("We hope you liked our service!")
                                         // Optionally, update the UI to reflect the new status
                                     }
                                 })

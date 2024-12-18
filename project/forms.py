@@ -1,5 +1,5 @@
 from django import forms
-from project.models import Dish, DishPrice, Table, TablePrice, Comment, Stars, Order, Check
+from project.models import Dish, DishPrice, Table, TablePrice, Comment, Stars, Order, Check, CartOfPrivileges, Allergies, LanguageOfCommunication, ExtraInfoUser
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
@@ -77,8 +77,32 @@ class OrderForm(forms.ModelForm):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         if user:
-            self.fields['id_check'].queryset = Check.objects.filter(id_client=user)
+            self.fields['id_check'].queryset = Check.objects.filter(id_client=user, status="Current")
     
     class Meta:
         model = Order
         fields = ["id_check", "number"]
+        
+class CartOfPrivilegesForm(forms.ModelForm):
+    
+    class Meta:
+        model = CartOfPrivileges
+        fields = ["id_client", "discount"]
+                
+class AllergiesForm(forms.ModelForm):
+    
+    class Meta:
+        model = Allergies
+        fields = ["name", "description"]   
+             
+class LanguageOfCommunicationForm(forms.ModelForm):
+    
+    class Meta:
+        model = LanguageOfCommunication
+        fields = ["language"]      
+          
+class ExtraInfoUserForm(forms.ModelForm):
+    
+    class Meta:
+        model = ExtraInfoUser
+        fields = ["user", "birthday", "allergies", "language_of_communication", "discount"]

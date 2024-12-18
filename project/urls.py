@@ -1,7 +1,7 @@
 from django.urls import path
 from project import views
 from project.views import (
-    SearchResultsView,
+    # SearchResultsView,
     LoginView,
     CustomLogoutView,
     SignupView,
@@ -36,7 +36,9 @@ from project.views import (
     StarsUpdateView,
     StarsDeleteView,
     CheckCreateView,
-    CheckListView,
+    CheckCurrentListView,
+    CheckInProcessListView,
+    CheckHistoryListView,
     CheckDetailView,
     CheckUpdateView,
     CheckDeleteView,
@@ -47,7 +49,25 @@ from project.views import (
     OrderDeleteView,
     CheckWaiterListView,
     change_status_pay, 
-    change_status_done
+    change_status_done,
+    dish_search, 
+    CartOfPrivilegesListView, 
+    CartOfPrivilegesDetailView, 
+    CartOfPrivilegesCreateView, 
+    CartOfPrivilegesUpdateView, 
+    CartOfPrivilegesDeleteView, 
+    AllergiesListView, 
+    # AllergiesDetailView, 
+    AllergiesCreateView, 
+    AllergiesDeleteView, 
+    LanguageOfCommunicationListView, 
+    # LanguageOfCommunicationDetailView, 
+    LanguageOfCommunicationCreateView, 
+    LanguageOfCommunicationDeleteView, 
+    ExtraInfoUserCreateView, 
+    ExtraInfoUserDetailView, 
+    ExtraInfoUserUpdateView, 
+    ExtraInfoUserDeleteView
 )
 
 urlpatterns = [
@@ -62,7 +82,7 @@ urlpatterns = [
     path('logout/', CustomLogoutView.as_view(), name='logout'),
     path('signup/', SignupView.as_view(), name='signup'),
 
-    path('search/', SearchResultsView.as_view(), name='search-results'),
+    path('search/', views.dish_search, name='search-results'),
 
     # Dish URLs
     path('dishes/', DishListView.as_view(), name='dish-list'),
@@ -103,7 +123,9 @@ urlpatterns = [
     path('stars/<int:pk>/delete/', StarsDeleteView.as_view(), name='stars-delete'),
 
     # Check URLs
-    path('checks/', CheckListView.as_view(), name='check-list'),
+    path('checks/current/', CheckCurrentListView.as_view(), name='check-current'),
+    path('checks/process/', CheckInProcessListView.as_view(), name='check-process'),
+    path('checks/history', CheckHistoryListView.as_view(), name='check-history'),
     path('checks/create/', CheckCreateView.as_view(), name='check-create'),
     path('checks/<int:pk>/update/', CheckUpdateView.as_view(), name='check-update'),
     path('checks/<int:pk>', CheckDetailView.as_view(), name='check-detail'),
@@ -115,7 +137,6 @@ urlpatterns = [
     path('change-status-done/<int:check_id>/', change_status_done, name='change_status_done'),
 
 
-    
 
     # Order URLs
     path('orders/', OrderListView.as_view(), name='order-list'),
@@ -123,4 +144,31 @@ urlpatterns = [
     path('orders/<int:pk>/', OrderDetailView.as_view(), name='order-detail'),
     path('orders/<int:pk>/update/', OrderUpdateView.as_view(), name='order-update'),
     path('orders/<int:pk>/delete/', OrderDeleteView.as_view(), name='order-delete'),
+    
+    # CartOfPrivileges URLs
+    path('privileges/', views.CartOfPrivilegesListView.as_view(), name='cart-privileges-list'),
+    path('privileges/new/', views.CartOfPrivilegesCreateView.as_view(), name='cart-privileges-create'),
+    path('privileges/<int:pk>/', views.CartOfPrivilegesDetailView.as_view(), name='cart-privileges-detail'),
+    path('privileges/<int:pk>/update/', views.CartOfPrivilegesUpdateView.as_view(), name='cart-privileges-update'),
+    path('privileges/<int:pk>/delete/', views.CartOfPrivilegesDeleteView.as_view(), name='cart-privileges-delete'),
+
+    # Allergies URLs
+    path('allergies/', views.AllergiesListView.as_view(), name='allergies-list'),
+    path('allergies/new/', views.AllergiesCreateView.as_view(), name='allergies-create'),
+    # path('allergies/<int:pk>/', views.AllergiesDetailView.as_view(), name='allergies-detail'),
+    path('allergies/<int:pk>/', views.AllergiesDeleteView.as_view(), name='allergies-delete'),
+
+    # Language URLs
+    path('languages/', views.LanguageOfCommunicationListView.as_view(), name='language-list'),
+    # path('languages/<int:pk>/', views.LanguageOfCommunicationDetailView.as_view(), name='language-detail'),
+    path('languages/new/', views.LanguageOfCommunicationCreateView.as_view(), name='language-create'),
+    path('languages/<int:pk>/', views.LanguageOfCommunicationDeleteView.as_view(), name='language-delete'),
+    
+
+    # Extra Info User URLs
+    path('extra-info/<int:pk>/', views.ExtraInfoUserDetailView.as_view(), name='extra-info-detail'),
+    path('extra-info/<int:pk>/update/', views.ExtraInfoUserUpdateView.as_view(), name='extra-info-update'),
+    path('extra-info/new/', views.ExtraInfoUserCreateView.as_view(), name='extra-info-create'),
+    path('extra-info/<int:pk>/delete/', views.ExtraInfoUserDeleteView.as_view(), name='extra-info-delete'),
+
 ]

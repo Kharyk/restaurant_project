@@ -1,10 +1,10 @@
 from django.shortcuts import render, reverse, redirect
 from django.urls import reverse_lazy
 from django.contrib.auth.models import User
-from project.models import Dish, DishPrice, Table, TablePrice, Comment, Stars, Order, Check
+from project.models import Dish, DishPrice, Table, TablePrice, Comment, Stars, Order, Check, CartOfPrivileges, Allergies, LanguageOfCommunication, ExtraInfoUser
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.contrib.auth.views import LogoutView
-from project.forms import DishForm, TableForm, DishPriceForm, TablePriceForm, CommentForm, StarsForm, CheckForm, OrderForm
+from project.forms import DishForm, TableForm, DishPriceForm, TablePriceForm, CommentForm, StarsForm, CheckForm, OrderForm, ExtraInfoUserForm, LanguageOfCommunicationForm, AllergiesForm, CartOfPrivilegesForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from project.mixin import StaffRequiredMixin
 from django.http import HttpResponseRedirect
@@ -25,25 +25,39 @@ from django.db.models import OuterRef, Subquery
 
 
 
-class SearchResultsView(View):
-    @method_decorator(login_required)
-    def get(self, request):
-        query = request.GET.get('q')
-        if query:
-            dish = Dish.objects.filter(
-                Q(name__icontains=query) | 
-                Q(ingredients__icontains=query) | 
-                Q(sort__icontains=query)
-            )
-            table = Table.objects.filter(
-                Q(name__icontains=query) | 
-                Q(zone__icontains=query) | 
-                Q(sort__icontains=query)
-            )
-        else:
-            tasks = Dish.objects.none()
-            projects = Table.objects.none()
-        return render(request, 'search_results.html', {'dish': dishs, 'table': tables, 'query': query})
+from django.db.models import Q
+from .models import Dish
+
+def dish_search(request):
+    queryset = Dish.objects.all()
+    
+    query = request.GET.get('q', '')
+    daytime = request.GET.get('daytime', '')
+    category = request.GET.get('category', '')
+    
+    if query:
+        queryset = queryset.filter(
+            Q(name__icontains=query) | 
+            Q(ingredients__icontains=query)
+        )
+    
+    if daytime:
+        queryset = queryset.filter(sort_daytime=daytime)
+    
+    if category:
+        queryset = queryset.filter(sort=category)
+    
+    context = {
+        'dishes': queryset,
+        'query': query,
+        'daytime': daytime,
+        'category': category,
+        'daytime_choices': Dish.SORTDT,
+        'category_choices': Dish.SORT
+    }
+    
+    return render(request, 'search_result.html', context)
+    
 
 class LoginView(View):
     template_name = 'login.html'
@@ -385,35 +399,47 @@ class CheckCreateView(LoginRequiredMixin, CreateView):
     form_class = CheckForm
 
     def form_valid(self, form):
-        # Create the Check instance but don't save it yet
         self.object = form.save(commit=False)
-        # Set the client (user) who is creating the check
         self.object.id_client = self.request.user
-        # Save the Check instance to the database
         self.object.save()
-        # Set the success URL to redirect to the check detail page
         self.success_url = reverse_lazy("check-detail", kwargs={'pk': self.object.pk})
         return super().form_valid(form)
 
     def get_form_kwargs(self):
-        # Get the default form kwargs
         kwargs = super().get_form_kwargs()
-        # Add the user to the kwargs for filtering in the form
         kwargs['user'] = self.request.user
         return kwargs
     
 
-class CheckListView(ListView):
+class CheckCurrentListView(ListView):
     model = Check
     template_name = "check/check_list.html"
     context_object_name = "checks"
     
     def get_queryset(self):
         return self.request.user.check_set.filter(
-            Q(status='Want to pay') | Q(status='In process')
+            Q(status='Current')
         )
     
+class CheckInProcessListView(ListView):
+    model = Check
+    template_name = "check/check_list.html"
+    context_object_name = "checks"
     
+    def get_queryset(self):
+        return self.request.user.check_set.filter(
+            Q(status='Want to pay') 
+        )
+        
+class CheckHistoryListView(ListView):
+    model = Check
+    template_name = "check/check_list.html"
+    context_object_name = "checks"
+    
+    def get_queryset(self):
+        return self.request.user.check_set.filter(
+            Q(status='Paid')
+        )
     
 
 
@@ -561,9 +587,9 @@ class CheckWaiterListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['sorts'] = [
-            ("paid", "Paid"),
-            ("wtp", "Want to pay"),
-            ("no paid", "In process")
+            ("Paid", "Paid"),
+            ("Want to pay", "Want to pay"),
+            ("Current", "Current")
         ]
         return context
     
@@ -582,16 +608,15 @@ def check_waiter_list_view(request):
 def change_status_pay(request, check_id):
     check = get_object_or_404(Check, id=check_id)
     
-    # Change the status to "Want to pay"
-    check.status = "Want to pay"
-    check.save()
+    if check.status != "Want to pay":
+        check.status = "Want to pay"
+        check.save()
     
-    return JsonResponse({'status': check.status})
+    return JsonResponse({'status': check.status})   
 
 def change_status_done(request, check_id):
     check = get_object_or_404(Check, id=check_id)
     
-    # Change the status to "Want to pay"
     check.status = "Paid"
     check.save()
     
@@ -619,7 +644,7 @@ class OrderCreateView(LoginRequiredMixin, CreateView):
         self.object.save() 
         self.object.id_dishes.add(dish)  
         
-        self.success_url = reverse_lazy("check-list")
+        self.success_url = reverse_lazy("dish-list")
         
         return super().form_valid(form)
 
@@ -678,6 +703,133 @@ class OrderDeleteView(LoginRequiredMixin, DeleteView):
     
     
     
+class CartOfPrivilegesListView(LoginRequiredMixin, ListView):
+    model = CartOfPrivileges
+    template_name = 'cart_of_privileges/cart_of_privileges_list.html'
+    context_object_name = 'privileges'
+
+    def get_queryset(self):
+        return CartOfPrivileges.objects.filter(id_client=self.request.user)
+
+class CartOfPrivilegesDetailView(LoginRequiredMixin, DetailView):
+    model = CartOfPrivileges
+    form_class = CartOfPrivilegesForm
+    template_name = 'cart_of_privileges/cart_of_privileges_detail.html'
     
+
+class CartOfPrivilegesCreateView(LoginRequiredMixin, CreateView):
+    model = CartOfPrivileges
+    template_name = 'cart_of_privileges/cart_of_privileges_form.html'
+    form_class = CartOfPrivilegesForm
+
+    def form_valid(self, form):
+        form.instance.id_client = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('cart-privileges-detail', kwargs={'pk': self.object.pk})
+
+class CartOfPrivilegesUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = CartOfPrivileges
+    template_name = 'cart_of_privileges/cart_of_privileges_form.html'
+    form_class = CartOfPrivilegesForm
+
+
+    def test_func(self):
+        privilege = self.get_object()
+        return self.request.user == privilege.id_client
+
+    def get_success_url(self):
+        return reverse_lazy('cart-privileges-detail', kwargs={'pk': self.object.pk})
+
+class CartOfPrivilegesDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = CartOfPrivileges
+    template_name = 'cart_of_privileges/cart_of_privileges_confirm_delete.html'
+    success_url = reverse_lazy('cart-privileges-list')
+
+    def test_func(self):
+        privilege = self.get_object()
+        return self.request.user == privilege.id_client
+
+
+
+class AllergiesListView(LoginRequiredMixin, ListView):
+    model = Allergies
+    template_name = 'allergies/allergies_list.html'
+    context_object_name = 'allergies'
+
+# class AllergiesDetailView(LoginRequiredMixin, DetailView):
+#     model = Allergies
+#     template_name = 'allergies_detail.html'
+
+class AllergiesCreateView(LoginRequiredMixin, CreateView):
+    model = Allergies
+    template_name = 'allergies/allergies_form.html'
+    form_class = AllergiesForm
+    success_url = reverse_lazy('allergies-list')
+
+class AllergiesDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Allergies
+    template_name = 'allergies/allergie_confirm_delete.html'
+    success_url = reverse_lazy('allergies-list')
+
+
+
+class LanguageOfCommunicationListView(LoginRequiredMixin, ListView):
+    model = LanguageOfCommunication
+    template_name = 'language/language_list.html'
+    context_object_name = 'languages'
+    
+# class LanguageOfCommunicationDetailView(LoginRequiredMixin, DetailView):
+#     model = LanguageOfCommunication
+#     template_name = 'language_detail.html'
+
+class LanguageOfCommunicationCreateView(LoginRequiredMixin, CreateView):
+    model = LanguageOfCommunication
+    template_name = 'language/languages_form.html'
+    form_class = LanguageOfCommunicationForm
+    success_url = reverse_lazy('language-list')
+
+class LanguageOfCommunicationDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = LanguageOfCommunication
+    template_name = 'language/language_confirm_delete.html'
+    success_url = reverse_lazy('language-list')
+    
+    
+    
+class ExtraInfoUserCreateView(LoginRequiredMixin, CreateView):
+    model = ExtraInfoUser
+    template_name = 'extra_info_user/extra_info_user_form.html'
+    form_class = ExtraInfoUserForm
+    success_url = reverse_lazy('dish-list')
+
+class ExtraInfoUserDetailView(LoginRequiredMixin, DetailView):  
+    model = ExtraInfoUser
+    form_class = ExtraInfoUserForm
+    template_name = 'extra_info_user/extra_info_user_detail.html'
+
+    def get_object(self, queryset=None):
+        return ExtraInfoUser.objects.get(user=self.request.user)
+
+class ExtraInfoUserUpdateView(LoginRequiredMixin, UpdateView):
+    model = ExtraInfoUser
+    form_class = ExtraInfoUserForm
+    template_name = 'extra_info_user/extra_info_user_form.html'
+
+    def get_object(self, queryset=None):
+        extra_info, created = ExtraInfoUser.objects.get_or_create(user=self.request.user)
+        return extra_info
+
+    def get_success_url(self):
+        return reverse_lazy('extra-info-detail')
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+    
+class ExtraInfoUserDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = ExtraInfoUser
+    template_name = 'extra_info_user/extra_info_user_delete.html'
+    success_url = reverse_lazy('dish-list')
 
 # Create your views here.

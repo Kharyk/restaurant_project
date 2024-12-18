@@ -2,6 +2,48 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum, F
 
+class CartOfPrivileges(models.Model):
+    
+    DISCOUNT = [
+        (0.9, '10%'),
+        (0.85, '15%'),
+        (0.7, '30%'),
+    ]
+    
+    id_client = models.ForeignKey(User, on_delete=models.CASCADE)
+    discount = models.DecimalField(max_digits=3, decimal_places=2, choices=DISCOUNT, default=0.9)  # Default to 10% discount
+
+class Allergies(models.Model):
+    
+    name = models.CharField(max_length=50, unique=True)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
+    
+class LanguageOfCommunication(models.Model):
+    
+    language = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.language
+    
+class Test(models.Model):
+    name = models.CharField( max_length=50)
+    
+    
+    
+
+class ExtraInfoUser(models.Model):
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    birthday = models.DateField(auto_now=False, auto_now_add=False)
+    allergies = models.ManyToManyField(Allergies)
+    language_of_communication = models.ManyToManyField(LanguageOfCommunication)
+    discount = models.ManyToManyField(CartOfPrivileges, blank=True)
+    foto = models.ImageField(upload_to='foto_user/', blank=True)
+
+
 class Dish(models.Model):
     SORTDT = [
         ("Breakfast", "breakfast"),
@@ -24,7 +66,8 @@ class Dish(models.Model):
     gram = models.CharField(max_length=255)
     sort_daytime = models.CharField(max_length=15, choices=SORTDT, blank=True, null=True)
     sort = models.CharField(max_length=50, choices=SORT)
-    image = models.ImageField( upload_to='dish_img/', blank = True, null = True)
+    allergies = models.ManyToManyField(Allergies)
+    image = models.ImageField(upload_to='dish_img/', blank=True, null=True)
     
 
 class Table(models.Model):
@@ -44,7 +87,7 @@ class Table(models.Model):
     number_of_people = models.IntegerField()
     zone = models.CharField(max_length=10, choices=ZONE)
     sort = models.CharField(max_length=20, choices=SORT)
-    image = models.ImageField(upload_to= "table_img/", blank = True, null = True)
+    image = models.ImageField(upload_to="table_img/", blank=True, null=True)
     
 
 class DishPrice(models.Model):
@@ -57,6 +100,7 @@ class TablePrice(models.Model):
     table = models.ForeignKey(Table, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateTimeField(auto_now_add=False)
+    text = models.TextField(blank=True)
     
 
 class Comment(models.Model):
@@ -65,7 +109,7 @@ class Comment(models.Model):
     id_dish = models.ForeignKey(Dish, on_delete=models.CASCADE)
     text = models.TextField()
     date = models.DateTimeField(auto_now_add=True) 
-    image = models.ImageField( upload_to= "omment_img/", blank = True, null = True)
+    image = models.ImageField( upload_to= "comment_img/", blank = True, null = True)
     
     
 class Stars(models.Model):
@@ -87,15 +131,15 @@ class Stars(models.Model):
 class Check(models.Model):
     
     STATUS = [
-        ("Paid", "paid"),
-        ("Want to pay", "wtp"),
-        ("In process", "not paid")
+        ("Paid", "Paid"),
+        ("Want to pay", "Want to pay"),
+        ("Current", "Current")
     ]
     
     id_client = models.ForeignKey(User, on_delete=models.CASCADE)
     id_table = models.ForeignKey('Table', on_delete=models.CASCADE)  
     date = models.DateTimeField(auto_now_add=True, editable=True)  
-    status = models.CharField(max_length=20, choices=STATUS, default="not paid")
+    status = models.CharField(max_length=20, choices=STATUS, default="Current")
 
     def calculate_price(self):
         if not self.id_client or not self.id_table:
@@ -186,3 +230,6 @@ class Order(models.Model):
                     'total_price': latest_price.price * self.number
                 })
         return dish_prices
+    
+    
+  
