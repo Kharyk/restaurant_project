@@ -11,16 +11,28 @@ class CartOfPrivileges(models.Model):
     ]
     
     id_client = models.ForeignKey(User, on_delete=models.CASCADE)
-    discount = models.DecimalField(max_digits=3, decimal_places=2, choices=DISCOUNT, default= '20%') 
+    discount = models.DecimalField(max_digits=3, decimal_places=2, choices=DISCOUNT, default=0.9)  # Default to 10% discount
 
 class Allergies(models.Model):
     
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
     
 class LanguageOfCommunication(models.Model):
     
-    language = models.CharField(max_length=50)
+    language = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.language
+    
+class Test(models.Model):
+    name = models.CharField( max_length=50)
+    
+    
+    
 
 class ExtraInfoUser(models.Model):
     
@@ -97,7 +109,7 @@ class Comment(models.Model):
     id_dish = models.ForeignKey(Dish, on_delete=models.CASCADE)
     text = models.TextField()
     date = models.DateTimeField(auto_now_add=True) 
-    image = models.ImageField( upload_to= "omment_img/", blank = True, null = True)
+    image = models.ImageField( upload_to= "comment_img/", blank = True, null = True)
     
     
 class Stars(models.Model):
