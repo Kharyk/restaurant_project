@@ -29,6 +29,7 @@ class ExtraInfoUser(models.Model):
     allergies = models.ManyToManyField(Allergies)
     language_of_communication = models.ManyToManyField(LanguageOfCommunication)
     discount = models.ManyToManyField(CartOfPrivileges, blank=True)
+    foto = models.ImageField(upload_to='foto_user/', blank=True)
 
 
 class Dish(models.Model):
@@ -87,6 +88,7 @@ class TablePrice(models.Model):
     table = models.ForeignKey(Table, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateTimeField(auto_now_add=False)
+    text = models.TextField(blank=True)
     
 
 class Comment(models.Model):

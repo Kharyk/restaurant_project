@@ -57,11 +57,11 @@ from project.views import (
     CartOfPrivilegesUpdateView, 
     CartOfPrivilegesDeleteView, 
     AllergiesListView, 
-    AllergiesDetailView, 
+    # AllergiesDetailView, 
     AllergiesCreateView, 
     AllergiesDeleteView, 
     LanguageOfCommunicationListView, 
-    LanguageOfCommunicationDetailView, 
+    # LanguageOfCommunicationDetailView, 
     LanguageOfCommunicationCreateView, 
     LanguageOfCommunicationDeleteView, 
     ExtraInfoUserCreateView, 
@@ -155,12 +155,12 @@ urlpatterns = [
     # Allergies URLs
     path('allergies/', views.AllergiesListView.as_view(), name='allergies-list'),
     path('allergies/new/', views.AllergiesCreateView.as_view(), name='allergies-create'),
-    path('allergies/<int:pk>/', views.AllergiesDetailView.as_view(), name='allergies-detail'),
+    # path('allergies/<int:pk>/', views.AllergiesDetailView.as_view(), name='allergies-detail'),
     path('allergies/<int:pk>/', views.AllergiesDeleteView.as_view(), name='allergies-delete'),
 
     # Language URLs
     path('languages/', views.LanguageOfCommunicationListView.as_view(), name='language-list'),
-    path('languages/<int:pk>/', views.LanguageOfCommunicationDetailView.as_view(), name='language-detail'),
+    # path('languages/<int:pk>/', views.LanguageOfCommunicationDetailView.as_view(), name='language-detail'),
     path('languages/new/', views.LanguageOfCommunicationCreateView.as_view(), name='language-create'),
     path('languages/<int:pk>/', views.LanguageOfCommunicationDeleteView.as_view(), name='language-delete'),
     

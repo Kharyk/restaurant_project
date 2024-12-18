@@ -1,5 +1,5 @@
 from django import forms
-from project.models import Dish, DishPrice, Table, TablePrice, Comment, Stars, Order, Check
+from project.models import Dish, DishPrice, Table, TablePrice, Comment, Stars, Order, Check, CartOfPrivileges, Allergies, LanguageOfCommunication, ExtraInfoUser
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 

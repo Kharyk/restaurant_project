@@ -7,7 +7,7 @@
     
 
     
-    <div class="row">
+    <div class="container mt-5">
         {% if dishes %}
             {% for dish in dishes %}
                 {% if forloop.first or forloop.counter0|divisibleby:4 %}
@@ -16,12 +16,12 @@
                 
                 <div class="col-md-3 mb-4">
                     <a href="{% url 'dish-detail' dish.id %}" style="text-decoration: none;">
-                        <div class="card border border-primary h-100">
+                        <div class="card body">
                             {% if dish.image %}
                                 <img src="{{ dish.image.url }}" class="card-img-top" alt="{{ dish.name }} image">
                             {% endif %}
                             <div class="card-body">
-                                <h5 class="card-title text-primary">{{ dish.name }}</h5>
+                                <h5 class="card-title" style="color: #123E65;">{{ dish.name }}</h5>
                                 <p class="card-text text-secondary">{{ dish.ingredients|truncate_words:10 }}</p>
                                 <p class="card-text text-secondary">{{ dish.gram }} gr</p>
                             
