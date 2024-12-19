@@ -5,13 +5,13 @@ from django.db.models import Sum, F
 class CartOfPrivileges(models.Model):
     
     DISCOUNT = [
-        (0.9, '10%'),
-        (0.85, '15%'),
-        (0.7, '30%'),
+        ('10', '10'),
+        ('15', '15'),
+        ('30', '30'),
     ]
     
     id_client = models.ForeignKey(User, on_delete=models.CASCADE)
-    discount = models.DecimalField(max_digits=3, decimal_places=2, choices=DISCOUNT, default=0.9)  # Default to 10% discount
+    discount = models.CharField(max_length=2, choices=DISCOUNT, default='10')  # Default to 10% discount
 
 class Allergies(models.Model):
     
@@ -28,10 +28,10 @@ class LanguageOfCommunication(models.Model):
     def __str__(self):
         return self.language
     
+    
+    
 class Test(models.Model):
     name = models.CharField( max_length=50)
-    
-    
     
 
 class ExtraInfoUser(models.Model):
