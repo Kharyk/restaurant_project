@@ -1,0 +1,27 @@
+<div class="row">
+    {% for language in languages %}
+        <div class="col-md-4 mb-3"> 
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">{{ language.language }}</h5>
+                    
+                </div>
+                <div class="d-flex justify-content-end">
+                    <div class="btn-group">
+                        {% if user.is_authenticated %}
+                            {% if user.is_staff %}
+                                <a href="{% url "allergies-delete" language.id%}" class="btn btn-sm btn-danger">-</a>
+                            {%endif%}
+                        {%endif%}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-md-12">
+            <div class="alert alert-warning" role="alert">
+                No language options available.
+            </div>
+        </div>
+    {% endfor %}
+</div>

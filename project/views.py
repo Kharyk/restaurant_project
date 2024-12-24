@@ -772,6 +772,9 @@ class AllergiesDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Allergies
     template_name = 'allergies/allergie_confirm_delete.html'
     success_url = reverse_lazy('allergies-list')
+    
+    def test_func(self):
+        return self.request.user.is_authenticated  
 
 
 
