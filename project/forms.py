@@ -87,7 +87,7 @@ class CartOfPrivilegesForm(forms.ModelForm):
     
     class Meta:
         model = CartOfPrivileges
-        fields = ["id_client", "discount"]
+        fields = []
                 
 class AllergiesForm(forms.ModelForm):
     

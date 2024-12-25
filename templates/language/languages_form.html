@@ -2,6 +2,9 @@
 {% load static %}
 
 {% block content %}
+<br>
+<br>
+
 <main class="main-content">
     <section>
         <h1 class="text-center">Create Language Of Communication</h1>
@@ -16,6 +19,7 @@
                     {% endif %}
                 </div>
             {% endfor %}
+            <br>
             <form method="post" action="{% url 'language-list' %}" >
                 <button type="submit" class="btn btn-success">Save</button>
                 <a href="{% url 'language-list' %}" class="btn btn-secondary">Cancel</a>

@@ -1,6 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum, F
+import qrcode
+from io import BytesIO
+from django.core.files import File
+from PIL import Image
+from datetime import date, timedelta
+
+
 
 class CartOfPrivileges(models.Model):
     
@@ -12,6 +19,41 @@ class CartOfPrivileges(models.Model):
     
     id_client = models.ForeignKey(User, on_delete=models.CASCADE)
     discount = models.CharField(max_length=2, choices=DISCOUNT, default='10')  # Default to 10% discount
+    startdate = models.DateField(auto_now=True)
+    enddate = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
+    qr_code = models.ImageField(upload_to='qr_codes/', blank=True)
+
+    def create_end_date(self):
+        self.enddate = date.today() + timedelta(days=365)
+        self.save()
+        return self.enddate
+    
+    
+    def generate_qr_code(self):
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr_data = f"Client: {self.id_client.username}\nDiscount: {self.discount}%\nStart Date: {self.startdate}"
+        qr.add_data(qr_data)
+        qr.make(fit=True)
+
+        qr_image = qr.make_image(fill_color="black", back_color="white")
+        
+        buffer = BytesIO()
+        qr_image.save(buffer, format='PNG')
+        filename = f'qr_code_{self.id_client.username}.png'
+        
+        self.qr_code.save(filename, File(buffer), save=False)
+        
+    def save(self, *args, **kwargs):
+        if not self.qr_code:
+            self.generate_qr_code()
+        if not self.enddate:
+            self.create_end_date()
+        super().save(*args, **kwargs)
 
 class Allergies(models.Model):
     
