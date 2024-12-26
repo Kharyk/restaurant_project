@@ -45,8 +45,11 @@
                     </table>
 
                     <h6 class="text-end">Table Price: ${{ table_price|floatformat:2 }}</h6>
-                    <h6 class="text-end text-primary">Price: ${{ total_price|floatformat:2 }}</h6>
-                    <h6 class="text-end text-primary">Discount: ${{ discount|floatformat:2 }}</h6>
+                    <h6 class="text-end">First Price: ${{ total_price|floatformat:2 }}</h6>
+
+                    <h6 class="text-end">Discount: {{ discount }}%</h6>
+                    <h6 class="text-end">BTW: {{ btw|floatformat:2 }}%</h6>
+
 
                     <h5 class="text-end text-success">Total Price: ${{ check.calculate_price|floatformat:2 }}</h5>
 

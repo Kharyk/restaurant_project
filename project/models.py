@@ -189,6 +189,7 @@ class Check(models.Model):
             return 0.00 
         
         total = 0 
+        btw = 21
         
         all_orders = self.orders.all()
         print(f'All orders related to check ID {self.id}: {[order.id for order in all_orders]}')
@@ -219,6 +220,10 @@ class Check(models.Model):
         if discount:
             discount_percentage = int(discount.discount)
             total *= Decimal(1 - (discount_percentage / 100))
+    
+        if btw:
+            print("btw")
+            total = total * Decimal(1 + btw / 100)
     
             
         return total

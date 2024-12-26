@@ -479,6 +479,9 @@ class CheckDetailView(LoginRequiredMixin, DetailView):
         for order in check.orders.all():
             for dish in order.id_dishes.all():
                 latest_price = DishPrice.objects.filter(dish=dish, date__lte=check.date).order_by('-date').first()
+                discount = CartOfPrivileges.objects.filter(id_client=self.request.user).first()
+                btw = 21
+
                 price = latest_price.price if latest_price else 0
                 quantity = order.number
                 total = price * quantity
@@ -487,6 +490,10 @@ class CheckDetailView(LoginRequiredMixin, DetailView):
                     'quantity': quantity,
                     'price': price,
                     'total': total,
+                    'discount': discount,
+                    
+
+
                 })
                 total_price += total
 
@@ -498,8 +505,11 @@ class CheckDetailView(LoginRequiredMixin, DetailView):
         else:
             context["table_price"] = 0
 
+        
         # Add calculated data to the context
         context["orders"] = orders
+        context["btw"] = btw
+        context["discount"] = discount.discount
         context["total_price"] = total_price
         return context
 
