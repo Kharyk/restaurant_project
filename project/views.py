@@ -479,6 +479,9 @@ class CheckDetailView(LoginRequiredMixin, DetailView):
         for order in check.orders.all():
             for dish in order.id_dishes.all():
                 latest_price = DishPrice.objects.filter(dish=dish, date__lte=check.date).order_by('-date').first()
+                discount = CartOfPrivileges.objects.filter(id_client=self.request.user).first()
+                btw = 21
+
                 price = latest_price.price if latest_price else 0
                 quantity = order.number
                 total = price * quantity
@@ -487,6 +490,10 @@ class CheckDetailView(LoginRequiredMixin, DetailView):
                     'quantity': quantity,
                     'price': price,
                     'total': total,
+                    'discount': discount,
+                    
+
+
                 })
                 total_price += total
 
@@ -498,8 +505,11 @@ class CheckDetailView(LoginRequiredMixin, DetailView):
         else:
             context["table_price"] = 0
 
+        
         # Add calculated data to the context
         context["orders"] = orders
+        context["btw"] = btw
+        context["discount"] = discount.discount
         context["total_price"] = total_price
         return context
 
@@ -715,20 +725,27 @@ class CartOfPrivilegesDetailView(LoginRequiredMixin, DetailView):
     model = CartOfPrivileges
     form_class = CartOfPrivilegesForm
     template_name = 'cart_of_privileges/cart_of_privileges_detail.html'
-    
+
 
 class CartOfPrivilegesCreateView(LoginRequiredMixin, CreateView):
     model = CartOfPrivileges
     template_name = 'cart_of_privileges/cart_of_privileges_form.html'
     form_class = CartOfPrivilegesForm
-
+    
+    def dispatch(self, request, *args, **kwargs):
+        if CartOfPrivileges.objects.filter(id_client=request.user).exists():
+            return redirect('cart-privileges-list')
+        return super().dispatch(request, *args, **kwargs)
+    
+    
     def form_valid(self, form):
         form.instance.id_client = self.request.user
         return super().form_valid(form)
-
+    
     def get_success_url(self):
-        return reverse_lazy('cart-privileges-detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('cart-privileges-list')
 
+    
 class CartOfPrivilegesUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = CartOfPrivileges
     template_name = 'cart_of_privileges/cart_of_privileges_form.html'
@@ -747,6 +764,12 @@ class CartOfPrivilegesDeleteView(LoginRequiredMixin, UserPassesTestMixin, Delete
     template_name = 'cart_of_privileges/cart_of_privileges_confirm_delete.html'
     success_url = reverse_lazy('cart-privileges-list')
 
+    def check_end_date(self):
+        if self.get_object().end_date < datetime.now():
+            return False
+        return True
+        
+    
     def test_func(self):
         privilege = self.get_object()
         return self.request.user == privilege.id_client
@@ -797,6 +820,9 @@ class LanguageOfCommunicationDeleteView(LoginRequiredMixin, UserPassesTestMixin,
     model = LanguageOfCommunication
     template_name = 'language/language_confirm_delete.html'
     success_url = reverse_lazy('language-list')
+    
+    def test_func(self):
+       return self.request.user.is_authenticated  
     
     
     

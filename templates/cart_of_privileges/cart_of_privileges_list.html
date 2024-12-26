@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class='row text-left poll-container'>
+        <div class="col-md-8 mx-auto">
+            {% if privileges %}
+                {%for privilege in privileges%}
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h3 class="card-title mb-0">Privilege Card</h3>
+                        </div>
+                        
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="card-details">
+                                            <h4 class="mb-3">{{ privilege.id_client.get_full_name }}</h4>
+                                            <p class="text-muted">Member since: {{ privilege.startdate|date:"F d, Y" }}</p>
+                                            
+                                            <div class="discount-badge my-4">
+                                                <span class="display-4">{{ privilege.discount }}%</span>
+                                                <p class="text-muted mb-0">Discount</p>
+                                            </div>
+                                            
+                                            <div class="member-info mt-4">
+                                                <p><strong>Username:</strong> {{ privilege.id_client.username }}</p>
+                                                <p><strong>Card ID:</strong> #{{ privilege.id }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 text-center">
+                                        <div class="qr-code-container">
+                                            {% if privilege.qr_code %}
+                                                <img src="{{ privilege.qr_code.url }}" alt="QR Code" class="img-fluid">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Valid until: {{ privilege.enddate|date:"F d, Y" }} </small>
+                                
+                                <div class="btn-group">
+                                    {% comment %}
+                                        <form action="{% url 'cart-privileges-delete' privilege.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                    onclick="return confirm('Are you sure you want to delete this privilege card?')">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    {% endcomment %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {%endfor%}
+            {% else %}
+            <br>
+            <br>
+            <br>
+
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4 class="text-muted mb-4">No Privilege Card Found</h4>
+                        <form action="{% url 'cart-privileges-create'%}" method="POST" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-success" 
+                                    onclick="return confirm('Are you sure you want to create this privilege card?')">
+                                Create
+                            </button>
+                        </form>
+                    
+                    </div>
+                </div>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>                
+                <br>
+
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .discount-badge {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .card-details {
+        padding: 10px;
+    }
+    
+    .member-info p {
+        margin-bottom: 0.5rem;
+    }
+    
+    .qr-placeholder {
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}
