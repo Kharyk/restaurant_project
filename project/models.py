@@ -6,6 +6,7 @@ from io import BytesIO
 from django.core.files import File
 from PIL import Image
 from datetime import date, timedelta
+from decimal import Decimal
 
 
 
@@ -213,7 +214,13 @@ class Check(models.Model):
         latest_table_price = TablePrice.objects.filter(table=self.id_table, date__lte=self.date).order_by('-date').first()
         if latest_table_price:
             total += latest_table_price.price 
-        
+            
+        discount = CartOfPrivileges.objects.filter(id_client=self.id_client).first()
+        if discount:
+            discount_percentage = int(discount.discount)
+            total *= Decimal(1 - (discount_percentage / 100))
+    
+            
         return total
     
     def get_dish_names(self):
