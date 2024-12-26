@@ -44,7 +44,7 @@
                                 <small class="text-muted">Valid until: {{ privilege.enddate|date:"F d, Y" }} </small>
                                 
                                 <div class="btn-group">
-                                    {% comment %}
+                                    
                                         <form action="{% url 'cart-privileges-delete' privilege.id %}" method="POST" class="d-inline">
                                             {% csrf_token %}
                                             <button type="submit" class="btn btn-sm btn-outline-danger" 
@@ -52,7 +52,7 @@
                                                 Delete
                                             </button>
                                         </form>
-                                    {% endcomment %}
+                                    
                                 </div>
                             </div>
                         </div>

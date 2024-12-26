@@ -469,18 +469,17 @@ class CheckDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        check = self.object  # The current Check instance
+        check = self.object 
 
-        # Initialize orders and total price
         orders = []
         total_price = 0
 
-        # Fetch related orders and calculate prices
+        discount = None  
+
         for order in check.orders.all():
             for dish in order.id_dishes.all():
                 latest_price = DishPrice.objects.filter(dish=dish, date__lte=check.date).order_by('-date').first()
                 discount = CartOfPrivileges.objects.filter(id_client=self.request.user).first()
-                btw = 21
 
                 price = latest_price.price if latest_price else 0
                 quantity = order.number
@@ -491,13 +490,9 @@ class CheckDetailView(LoginRequiredMixin, DetailView):
                     'price': price,
                     'total': total,
                     'discount': discount,
-                    
-
-
                 })
                 total_price += total
 
-        # Add table price if applicable
         latest_table_price = TablePrice.objects.filter(table=check.id_table, date__lte=check.date).order_by('-date').first()
         if latest_table_price:
             total_price += latest_table_price.price
@@ -505,11 +500,8 @@ class CheckDetailView(LoginRequiredMixin, DetailView):
         else:
             context["table_price"] = 0
 
-        
-        # Add calculated data to the context
         context["orders"] = orders
-        context["btw"] = btw
-        context["discount"] = discount.discount
+        context["discount"] = discount.discount if discount else None  
         context["total_price"] = total_price
         return context
 
@@ -725,6 +717,8 @@ class CartOfPrivilegesDetailView(LoginRequiredMixin, DetailView):
     model = CartOfPrivileges
     form_class = CartOfPrivilegesForm
     template_name = 'cart_of_privileges/cart_of_privileges_detail.html'
+    
+    
 
 
 class CartOfPrivilegesCreateView(LoginRequiredMixin, CreateView):
@@ -825,20 +819,38 @@ class LanguageOfCommunicationDeleteView(LoginRequiredMixin, UserPassesTestMixin,
        return self.request.user.is_authenticated  
     
     
-    
+
 class ExtraInfoUserCreateView(LoginRequiredMixin, CreateView):
     model = ExtraInfoUser
     template_name = 'extra_info_user/extra_info_user_form.html'
     form_class = ExtraInfoUserForm
-    success_url = reverse_lazy('dish-list')
+    
+    def get_success_url(self):
+        return reverse_lazy('extra-info-list')
+    
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+    
+class ExtraInfoUserListView(LoginRequiredMixin, ListView):
+    model = ExtraInfoUser
+    template_name = 'extra_info_user/extra_info_user_list.html'
+    context_object_name = 'extra_infos'
+    def get_queryset(self):
+        return ExtraInfoUser.objects.filter(user=self.request.user)   
 
 class ExtraInfoUserDetailView(LoginRequiredMixin, DetailView):  
     model = ExtraInfoUser
     form_class = ExtraInfoUserForm
     template_name = 'extra_info_user/extra_info_user_detail.html'
+    context_object_name = 'extra_info'
+    queryset = ExtraInfoUser.objects.all()
 
-    def get_object(self, queryset=None):
-        return ExtraInfoUser.objects.get(user=self.request.user)
+    def get_queryset(self):
+        return ExtraInfoUser.objects.filter(user=self.request.user)
+
+
+    
 
 class ExtraInfoUserUpdateView(LoginRequiredMixin, UpdateView):
     model = ExtraInfoUser
@@ -850,7 +862,7 @@ class ExtraInfoUserUpdateView(LoginRequiredMixin, UpdateView):
         return extra_info
 
     def get_success_url(self):
-        return reverse_lazy('extra-info-detail')
+        return reverse_lazy('extra-info-list')
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -860,5 +872,8 @@ class ExtraInfoUserDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteVie
     model = ExtraInfoUser
     template_name = 'extra_info_user/extra_info_user_delete.html'
     success_url = reverse_lazy('dish-list')
+    
+    def test_func(self):
+       return self.request.user.is_authenticated  
 
 # Create your views here.

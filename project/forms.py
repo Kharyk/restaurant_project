@@ -105,4 +105,4 @@ class ExtraInfoUserForm(forms.ModelForm):
     
     class Meta:
         model = ExtraInfoUser
-        fields = ["user", "birthday", "allergies", "language_of_communication", "discount"]
+        fields = ["birthday",'foto', "allergies", "language_of_communication", "discount"]

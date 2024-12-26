@@ -67,7 +67,8 @@ from project.views import (
     ExtraInfoUserCreateView, 
     ExtraInfoUserDetailView, 
     ExtraInfoUserUpdateView, 
-    ExtraInfoUserDeleteView
+    ExtraInfoUserDeleteView,
+    ExtraInfoUserListView
 )
 
 urlpatterns = [
@@ -169,6 +170,8 @@ urlpatterns = [
     path('extra-info/<int:pk>/', views.ExtraInfoUserDetailView.as_view(), name='extra-info-detail'),
     path('extra-info/<int:pk>/update/', views.ExtraInfoUserUpdateView.as_view(), name='extra-info-update'),
     path('extra-info/new/', views.ExtraInfoUserCreateView.as_view(), name='extra-info-create'),
-    path('extra-info/<int:pk>/delete/', views.ExtraInfoUserDeleteView.as_view(), name='extra-info-delete'),
+    path('extra-info/<int:pk>/delete/', views.ExtraInfoUserDeleteView.as_view(), name='extra-info-delete'),    
+    path('extra-info/list/', views.ExtraInfoUserListView.as_view(), name='extra-info-list'),
+
 
 ]

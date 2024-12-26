@@ -73,10 +73,6 @@ class LanguageOfCommunication(models.Model):
     
     
     
-class Test(models.Model):
-    name = models.CharField( max_length=50)
-    
-
 class ExtraInfoUser(models.Model):
     
     user = models.OneToOneField(User, on_delete=models.CASCADE)
