@@ -9,9 +9,24 @@
             <a href="{% url 'check-detail' check.id %}" style="text-decoration: none;">
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-white text-center">
-                        <p>Client <strong>{{ check.id_client.username }}</strong> wants to pay the check number <strong>{{ check.id}}</strong></p>
+                        <p>Client <strong>{{ check.id_client.get_full_name }}</strong> wants to pay the check number <strong>{{ check.id}}</strong></p>
                     </div>
                     <div class="card-body">
+                        <div class="row mb-3">
+                            
+                            <div class="col-md-6">
+                                <p><strong>Languages:</strong>
+                                    {% if check.id_client.extrainfouser.language_of_communication.all %}
+                                        {% for language in check.id_client.extrainfouser.language_of_communication.all %}
+                                            {{ language.language }}{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        No languages recorded.
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+
                         <div class="row mb-3">
                             
                             <div class="col-md-6">

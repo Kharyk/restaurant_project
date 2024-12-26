@@ -311,6 +311,9 @@
                               <li><a class="dropdown-item" name="history" value="True" href="{% url 'check-history' %}">History</a></li>
                           </ul>
                         </li>
+                        <li>
+                          <a class="nav-link active" href="{% url 'extra-info-list' %}">You</a>
+                        </li>
                       {%endif%}
                     
                     {% if user.is_authenticated %}

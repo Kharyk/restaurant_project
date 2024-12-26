@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            {% if extra_infos %}
+                {%for extra_info in extra_infos%}
+                <div class="card">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">User Profile</h3>
+                        <a href="{% url 'extra-info-update' extra_info.id %}" class="btn btn-light btn-sm">Edit Profile</a>
+                        
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Profile Photo -->
+                            <div class="col-md-3 text-center mb-4">
+                                {% if extra_info.foto %}
+                                    <img src="{{ extra_info.foto.url }}" alt="Profile Photo" 
+                                         class="img-fluid rounded-circle profile-image mb-3">
+                                {% else %}
+                                    <div class="default-profile-image rounded-circle mb-3">
+                                        {{ extra_info.user.username|make_list|first|upper }}
+                                    </div>
+                                {% endif %}
+                                <h4>{{ extra_info.user.get_full_name }}</h4>
+                                <p class="text-muted">@{{ extra_info.user.username }}</p>
+                            </div>
+                            
+                            <!-- User Details -->
+                            <div class="col-md-9">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5 class="mb-3">Personal Information</h5>
+                                        <p><strong>Birthday:</strong> {{ extra_info.birthday|date:"F d, Y" }}</p>
+                                        <p><strong>Email:</strong> {{ extra_info.user.email }}</p>
+                                        
+                                        <h5 class="mt-4 mb-3">Allergies</h5>
+                                        <div class="mb-3">
+                                            {% for allergy in extra_info.allergies.all %}
+                                                <span class="badge bg-warning text-dark me-2 mb-2">{{ allergy.name }}</span>
+                                            {% empty %}
+                                                <p class="text-muted">No allergies listed</p>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <h5 class="mb-3">Languages</h5>
+                                        <div class="mb-3">
+                                            {% for language in extra_info.language_of_communication.all %}
+                                                <span class="badge bg-info text-dark me-2 mb-2">{{ language.language }}</span>
+                                            {% empty %}
+                                                <p class="text-muted">No languages listed</p>
+                                            {% endfor %}
+                                        </div>
+                                        
+                                        <h5 class="mt-4 mb-3">Discount Cards</h5>
+                                        {% for cart in extra_info.discount.all %}
+                                            <div class="discount-card mb-2 p-3 bg-light rounded">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="h5 mb-0">{{ cart.discount }}% Discount</span>
+                                                    <small class="text-muted">Since {{ cart.startdate|date:"M d, Y" }}</small>
+                                                </div>
+                                                {% if cart.qr_code %}
+                                                    <img src="{{ cart.qr_code.url }}" alt="QR Code" 
+                                                         class="qr-code-small mt-2" style="width: 100px;">
+                                                {% endif %}
+                                            </div>
+                                        {% empty %}
+                                            <p class="text-muted">No discount cards</p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <form action="{% url 'extra-info-delete' extra_info.id %}" method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                onclick="return confirm('Are you sure you want to delete {{ extra_info.id_client.username }}\'s information?')">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+                
+                {%endfor%}
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <h4>Profile Not Found</h4>
+                    <p>Additional information has not been set up for this user.</p>
+                    <a href="{% url 'extra-info-create' %}" class="btn btn-primary">Create Profile</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-image {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+    }
+    
+    .default-profile-image {
+        width: 200px;
+        height: 200px;
+        background: #6c757d;
+        color: white;
+        font-size: 72px;
+        line-height: 200px;
+        margin: 0 auto;
+    }
+    
+    .qr-code-small {
+        max-width: 100px;
+        height: auto;
+    }
+    
+    .badge {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}

@@ -26,7 +26,7 @@ class DishForm(forms.ModelForm):
     
     class Meta:
         model = Dish
-        fields = ['name', 'ingredients', 'gram', 'allergies', 'sort_daytime', 'sort', 'image']
+        fields = ['name', 'ingredients', "allergies", 'gram', 'allergies', 'sort_daytime', 'sort', 'image']
         
         
 class TableForm(forms.ModelForm):
@@ -105,4 +105,4 @@ class ExtraInfoUserForm(forms.ModelForm):
     
     class Meta:
         model = ExtraInfoUser
-        fields = ["user", "birthday", "allergies", "language_of_communication", "discount"]
+        fields = ["birthday",'foto', "allergies", "language_of_communication", "discount"]

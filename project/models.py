@@ -73,10 +73,6 @@ class LanguageOfCommunication(models.Model):
     
     
     
-class Test(models.Model):
-    name = models.CharField( max_length=50)
-    
-
 class ExtraInfoUser(models.Model):
     
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -106,6 +102,7 @@ class Dish(models.Model):
     
     name = models.CharField(max_length=255)
     ingredients = models.TextField()
+    allergies = models.ManyToManyField(Allergies)
     gram = models.CharField(max_length=255)
     sort_daytime = models.CharField(max_length=15, choices=SORTDT, blank=True, null=True)
     sort = models.CharField(max_length=50, choices=SORT)

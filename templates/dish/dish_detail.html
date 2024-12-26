@@ -16,6 +16,17 @@
                             {% endif %}
                             <div class="text-container ms-3">
                                 <p class="text-muted">{{ dish.ingredients }}</p>
+                                <br>
+                                <p class="text-muted">Allergies: 
+                                    {% if dish.allergies.all %}
+                                        {% for allergy in dish.allergies.all %}
+                                            {{ allergy.name }}{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        None
+                                    {% endif %}
+                                </p>
+                                
                                 
                             </div>
                         </div>
