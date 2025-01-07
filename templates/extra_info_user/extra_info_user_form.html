@@ -16,11 +16,10 @@
                     {% endif %}
                 </div>
             {% endfor %}
-            <form method="post" action="{% url 'dish-list' %}" >
-                <button type="submit" class="btn btn-success">Save</button>
-                <a href="{% url 'dish-list' %}" class="btn btn-secondary">Cancel</a>
-
-            </form>
+            <br>
+            <button type="submit" class="btn btn-success">Save</button>
+            <a href="{% url 'dish-list'  %}" class="btn btn-secondary">Cancel</a>
+            
         
             
         </form>

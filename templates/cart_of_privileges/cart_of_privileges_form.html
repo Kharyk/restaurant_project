@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="main-content">
+    <section>
+        <h1 class="text-center">Create Cart Of Privileges</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="alert alert-danger">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <form method="post" action="{% url 'cart-privileges-list' %}" >
+                <button type="submit" class="btn btn-success">Save</button>
+                <a href="{% url 'cart-privileges-list' %}" class="btn btn-secondary">Cancel</a>
+
+            </form>
+        
+            
+        </form>
+    </section>
+</main>
+{% endblock %}

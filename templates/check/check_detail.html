@@ -45,7 +45,15 @@
                     </table>
 
                     <h6 class="text-end">Table Price: ${{ table_price|floatformat:2 }}</h6>
-                    <h5 class="text-end text-success">Total Price: ${{ total_price|floatformat:2 }}</h5>
+                    <h6 class="text-end">First Price: ${{ total_price|floatformat:2 }}</h6>
+
+                    <h6 class="text-end">Discount: {{ discount }}%</h6>
+                    <h6 class="text-end">BTW: 21%</h6>
+
+
+                    <h5 class="text-end text-success">Total Price: ${{ check.calculate_price|floatformat:2 }}</h5>
+
+                    
 
                     <div class="d-flex justify-content-end mt-3">
                         {% if user.is_authenticated %}

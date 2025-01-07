@@ -67,7 +67,8 @@ from project.views import (
     ExtraInfoUserCreateView, 
     ExtraInfoUserDetailView, 
     ExtraInfoUserUpdateView, 
-    ExtraInfoUserDeleteView
+    ExtraInfoUserDeleteView,
+    ExtraInfoUserListView
 )
 
 urlpatterns = [
@@ -150,7 +151,7 @@ urlpatterns = [
     path('privileges/new/', views.CartOfPrivilegesCreateView.as_view(), name='cart-privileges-create'),
     path('privileges/<int:pk>/', views.CartOfPrivilegesDetailView.as_view(), name='cart-privileges-detail'),
     path('privileges/<int:pk>/update/', views.CartOfPrivilegesUpdateView.as_view(), name='cart-privileges-update'),
-    path('privileges/<int:pk>/delete/', views.CartOfPrivilegesDeleteView.as_view(), name='cart-privileges-delete'),
+    path('privileges/delete/<int:pk>/', views.CartOfPrivilegesDeleteView.as_view(), name='cart-privileges-delete'),
 
     # Allergies URLs
     path('allergies/', views.AllergiesListView.as_view(), name='allergies-list'),
@@ -169,6 +170,8 @@ urlpatterns = [
     path('extra-info/<int:pk>/', views.ExtraInfoUserDetailView.as_view(), name='extra-info-detail'),
     path('extra-info/<int:pk>/update/', views.ExtraInfoUserUpdateView.as_view(), name='extra-info-update'),
     path('extra-info/new/', views.ExtraInfoUserCreateView.as_view(), name='extra-info-create'),
-    path('extra-info/<int:pk>/delete/', views.ExtraInfoUserDeleteView.as_view(), name='extra-info-delete'),
+    path('extra-info/<int:pk>/delete/', views.ExtraInfoUserDeleteView.as_view(), name='extra-info-delete'),    
+    path('extra-info/list/', views.ExtraInfoUserListView.as_view(), name='extra-info-list'),
+
 
 ]

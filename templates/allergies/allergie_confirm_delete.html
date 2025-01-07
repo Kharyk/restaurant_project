@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="main-content">
+    <section>
+        <h1 class="text-center">Confirm Deletion</h1>
+        <p>Are you sure you want to delete this allergy?</p>
+        <br>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Confirm</button>
+            <a href="{% url 'allergies-list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </section>
+</main>
+<br>
+<br>
+<br>
+
+{% endblock %}

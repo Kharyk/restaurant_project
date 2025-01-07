@@ -469,16 +469,18 @@ class CheckDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        check = self.object  # The current Check instance
+        check = self.object 
 
-        # Initialize orders and total price
         orders = []
         total_price = 0
 
-        # Fetch related orders and calculate prices
+        discount = None  
+
         for order in check.orders.all():
             for dish in order.id_dishes.all():
                 latest_price = DishPrice.objects.filter(dish=dish, date__lte=check.date).order_by('-date').first()
+                discount = CartOfPrivileges.objects.filter(id_client=self.request.user).first()
+
                 price = latest_price.price if latest_price else 0
                 quantity = order.number
                 total = price * quantity
@@ -487,10 +489,10 @@ class CheckDetailView(LoginRequiredMixin, DetailView):
                     'quantity': quantity,
                     'price': price,
                     'total': total,
+                    'discount': discount,
                 })
                 total_price += total
 
-        # Add table price if applicable
         latest_table_price = TablePrice.objects.filter(table=check.id_table, date__lte=check.date).order_by('-date').first()
         if latest_table_price:
             total_price += latest_table_price.price
@@ -498,8 +500,8 @@ class CheckDetailView(LoginRequiredMixin, DetailView):
         else:
             context["table_price"] = 0
 
-        # Add calculated data to the context
         context["orders"] = orders
+        context["discount"] = discount.discount if discount else None  
         context["total_price"] = total_price
         return context
 
@@ -716,19 +718,28 @@ class CartOfPrivilegesDetailView(LoginRequiredMixin, DetailView):
     form_class = CartOfPrivilegesForm
     template_name = 'cart_of_privileges/cart_of_privileges_detail.html'
     
+    
+
 
 class CartOfPrivilegesCreateView(LoginRequiredMixin, CreateView):
     model = CartOfPrivileges
     template_name = 'cart_of_privileges/cart_of_privileges_form.html'
     form_class = CartOfPrivilegesForm
-
+    
+    def dispatch(self, request, *args, **kwargs):
+        if CartOfPrivileges.objects.filter(id_client=request.user).exists():
+            return redirect('cart-privileges-list')
+        return super().dispatch(request, *args, **kwargs)
+    
+    
     def form_valid(self, form):
         form.instance.id_client = self.request.user
         return super().form_valid(form)
-
+    
     def get_success_url(self):
-        return reverse_lazy('cart-privileges-detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('cart-privileges-list')
 
+    
 class CartOfPrivilegesUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = CartOfPrivileges
     template_name = 'cart_of_privileges/cart_of_privileges_form.html'
@@ -747,6 +758,12 @@ class CartOfPrivilegesDeleteView(LoginRequiredMixin, UserPassesTestMixin, Delete
     template_name = 'cart_of_privileges/cart_of_privileges_confirm_delete.html'
     success_url = reverse_lazy('cart-privileges-list')
 
+    def check_end_date(self):
+        if self.get_object().end_date < datetime.now():
+            return False
+        return True
+        
+    
     def test_func(self):
         privilege = self.get_object()
         return self.request.user == privilege.id_client
@@ -772,6 +789,9 @@ class AllergiesDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Allergies
     template_name = 'allergies/allergie_confirm_delete.html'
     success_url = reverse_lazy('allergies-list')
+    
+    def test_func(self):
+        return self.request.user.is_authenticated  
 
 
 
@@ -795,21 +815,42 @@ class LanguageOfCommunicationDeleteView(LoginRequiredMixin, UserPassesTestMixin,
     template_name = 'language/language_confirm_delete.html'
     success_url = reverse_lazy('language-list')
     
+    def test_func(self):
+       return self.request.user.is_authenticated  
     
     
+
 class ExtraInfoUserCreateView(LoginRequiredMixin, CreateView):
     model = ExtraInfoUser
     template_name = 'extra_info_user/extra_info_user_form.html'
     form_class = ExtraInfoUserForm
-    success_url = reverse_lazy('dish-list')
+    
+    def get_success_url(self):
+        return reverse_lazy('extra-info-list')
+    
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+    
+class ExtraInfoUserListView(LoginRequiredMixin, ListView):
+    model = ExtraInfoUser
+    template_name = 'extra_info_user/extra_info_user_list.html'
+    context_object_name = 'extra_infos'
+    def get_queryset(self):
+        return ExtraInfoUser.objects.filter(user=self.request.user)   
 
 class ExtraInfoUserDetailView(LoginRequiredMixin, DetailView):  
     model = ExtraInfoUser
     form_class = ExtraInfoUserForm
     template_name = 'extra_info_user/extra_info_user_detail.html'
+    context_object_name = 'extra_info'
+    queryset = ExtraInfoUser.objects.all()
 
-    def get_object(self, queryset=None):
-        return ExtraInfoUser.objects.get(user=self.request.user)
+    def get_queryset(self):
+        return ExtraInfoUser.objects.filter(user=self.request.user)
+
+
+    
 
 class ExtraInfoUserUpdateView(LoginRequiredMixin, UpdateView):
     model = ExtraInfoUser
@@ -821,7 +862,7 @@ class ExtraInfoUserUpdateView(LoginRequiredMixin, UpdateView):
         return extra_info
 
     def get_success_url(self):
-        return reverse_lazy('extra-info-detail')
+        return reverse_lazy('extra-info-list')
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -831,5 +872,8 @@ class ExtraInfoUserDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteVie
     model = ExtraInfoUser
     template_name = 'extra_info_user/extra_info_user_delete.html'
     success_url = reverse_lazy('dish-list')
+    
+    def test_func(self):
+       return self.request.user.is_authenticated  
 
 # Create your views here.

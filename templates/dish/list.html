@@ -9,6 +9,8 @@
             {% endif %}
             <div class="card-body">
                 <h5 class="card-title" style="color: #123E65;">{{ dish.name }}</h5>
+                <p class="card-text" style="color: #1a4990;">Allergies: {% if dish.allergies %} {{ dish.allergies.name }} {% else %} None {% endif %}</p>
+                
                 <p class="card-text" style="color: #1a4990;">{{ dish.ingredients|truncate_words:10 }}</p>
                 <p class="card-text" style="color: #1a4990;">{{ dish.gram }} gr</p>
                 

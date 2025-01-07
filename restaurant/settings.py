@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-g&_wmde*6@=$j#+0t#$=6mybna!cc265h_qe-&t3%o1g6q^mw8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [".onrender.com"]
 
 
 # Application definition
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -126,6 +127,9 @@ MEDIA_ROOT = BASE_DIR / "mediafiles"
 MEDIAFILES_DIRS = [
     BASE_DIR / "media",
 ]
+
+STATICFILES_STORAGE = "whitenoise.storage. CompressedManifestStaticFilesStorage"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

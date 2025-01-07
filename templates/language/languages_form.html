@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<br>
+<br>
+
+<main class="main-content">
+    <section>
+        <h1 class="text-center">Create Language Of Communication</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="alert alert-danger">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <br>
+            <form method="post" action="{% url 'language-list' %}" >
+                <button type="submit" class="btn btn-success">Save</button>
+                <a href="{% url 'language-list' %}" class="btn btn-secondary">Cancel</a>
+
+            </form>
+        
+            
+        </form>
+    </section>
+</main>
+{% endblock %}
