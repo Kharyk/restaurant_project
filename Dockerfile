@@ -17,4 +17,4 @@ COPY . /app/
 RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
-CMD ["gunicorn", "--workers=4", "--bind=0.0.0.0:8000", "--log-level=info", "project.wsgi:application"]
+CMD ["gunicorn", "--workers=4", "--bind=0.0.0.0:8000", "--log-level=info", "restaurant.wsgi:application"]
