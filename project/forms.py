@@ -102,7 +102,15 @@ class LanguageOfCommunicationForm(forms.ModelForm):
         fields = ["language"]      
           
 class ExtraInfoUserForm(forms.ModelForm):
-    
     class Meta:
         model = ExtraInfoUser
-        fields = ["birthday",'foto', "allergies", "language_of_communication", "discount"]
+        fields = ["birthday", 'foto', "allergies", "language_of_communication", "discount"]
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)  # Properly pop the user from kwargs
+        super().__init__(*args, **kwargs)
+        print('hiiiiiiiiii')
+
+        if user:
+            self.fields['discount'].queryset = CartOfPrivileges.objects.filter(id_client=user)
+            print('hi')

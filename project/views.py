@@ -821,12 +821,16 @@ class LanguageOfCommunicationDeleteView(LoginRequiredMixin, UserPassesTestMixin,
     
 
 class ExtraInfoUserCreateView(LoginRequiredMixin, CreateView):
-    model = ExtraInfoUser
-    template_name = 'extra_info_user/extra_info_user_form.html'
-    form_class = ExtraInfoUserForm
     
-    def get_success_url(self):
-        return reverse_lazy('extra-info-list')
+    model = ExtraInfoUser
+    form_class = ExtraInfoUserForm
+    template_name = 'extra_info_user/extra_info_user_form.html'
+    success_url = reverse_lazy('extra-info-list')  # Replace with your actual URL name
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
     
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -856,14 +860,19 @@ class ExtraInfoUserUpdateView(LoginRequiredMixin, UpdateView):
     model = ExtraInfoUser
     form_class = ExtraInfoUserForm
     template_name = 'extra_info_user/extra_info_user_form.html'
-
+    
     def get_object(self, queryset=None):
         extra_info, created = ExtraInfoUser.objects.get_or_create(user=self.request.user)
         return extra_info
-
+    
     def get_success_url(self):
         return reverse_lazy('extra-info-list')
-
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+    
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)

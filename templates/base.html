@@ -272,48 +272,49 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="{% url "table-list" %}">Table</a>
                     </li>
-
-                    {%if user.is_staff or user.is_superuser%}
-                      <li class="nav-item">
-                        <a class="nav-link active" href="{% url "waiter-check-list" %}">Check</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link active" href="{% url "allergies-list" %}">AL</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link active" href="{% url "language-list" %}">LNG</a>
-                      </li>
-                    {%else%}  
-                      <li class="nav-item">
-                        <a class="nav-link active" href="{% url "cart-privileges-list" %}">Cart</a>
-                      </li>
-                      <li class="nav-item dropdown">
-                          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                              Check
-                          </a>
-                          <ul class="dropdown-menu">
-                              <li>
-                                  <a class="dropdown-item" name="current" value="True" href="{% if user.is_authenticated %}
-                                      
-                                      {% if user.check_set.exists %}
-                                          {% url 'check-current' %}
-                                      {% else %}
-                                          {% url 'check-create' %}
-                                      {% endif %}
-                                  {% else %}
-                                      {% url 'login' %}
-                                  {% endif %}">
-                                      Current
-                                  </a>
-                              </li>
-                              <li><a class="dropdown-item" name="in_process" value="True" href="{% url 'check-process' %}">In Process</a></li>
-                              <li><hr class="dropdown-divider"></li>
-                              <li><a class="dropdown-item" name="history" value="True" href="{% url 'check-history' %}">History</a></li>
-                          </ul>
+                    {% if user.is_authenticated %}
+                      {%if user.is_staff or user.is_superuser%}
+                        <li class="nav-item">
+                          <a class="nav-link active" href="{% url "waiter-check-list" %}">Check</a>
                         </li>
-                        <li>
-                          <a class="nav-link active" href="{% url 'extra-info-list' %}">You</a>
+                        <li class="nav-item">
+                          <a class="nav-link active" href="{% url "allergies-list" %}">AL</a>
                         </li>
+                        <li class="nav-item">
+                          <a class="nav-link active" href="{% url "language-list" %}">LNG</a>
+                        </li>
+                      {%else%}  
+                        <li class="nav-item">
+                          <a class="nav-link active" href="{% url "cart-privileges-list" %}">Cart</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Check
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" name="current" value="True" href="{% if user.is_authenticated %}
+                                        
+                                        {% if user.check_set.exists %}
+                                            {% url 'check-current' %}
+                                        {% else %}
+                                            {% url 'check-create' %}
+                                        {% endif %}
+                                    {% else %}
+                                        {% url 'login' %}
+                                    {% endif %}">
+                                        Current
+                                    </a>
+                                </li>
+                                <li><a class="dropdown-item" name="in_process" value="True" href="{% url 'check-process' %}">In Process</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" name="history" value="True" href="{% url 'check-history' %}">History</a></li>
+                            </ul>
+                          </li>
+                          <li>
+                            <a class="nav-link active" href="{% url 'extra-info-list' %}">You</a>
+                          </li>
+                        {%endif%}
                       {%endif%}
                     
                     {% if user.is_authenticated %}
