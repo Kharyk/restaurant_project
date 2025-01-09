@@ -25,6 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = True
 
 from decouple import config
+import cloudinary
 
 ALLOWED_HOSTS = ['.onrender.com'] 
 # ALLOWED_HOSTS = [config('ALLOWED_HOSTS', default='127.0.0.1')]
