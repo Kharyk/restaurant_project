@@ -37,7 +37,7 @@ cloudinary.config(
 )
 
 env = environ.Env()
-environ.Env.read_env('.env')
+environ.Env.read_env('.env_pro')
 
 # Application definition
 
