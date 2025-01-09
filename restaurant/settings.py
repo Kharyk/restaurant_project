@@ -19,8 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-g&_wmde*6@=$j#+0t#$=6mybna!cc265h_qe-&t3%o1g6q^mw8'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -29,7 +28,16 @@ from decouple import config
 
 ALLOWED_HOSTS = ['.onrender.com'] 
 # ALLOWED_HOSTS = [config('ALLOWED_HOSTS', default='127.0.0.1')]
+import environ 
 
+cloudinary.config(
+    cloud_name = "cloud",
+    api_key = "4D5T2N3bwd=Ee$=w{N^;",
+    api_secret = "fvOU^A<2144)7TE"
+)
+
+env = environ.Env()
+environ.Env.read_env('.env')
 
 # Application definition
 
