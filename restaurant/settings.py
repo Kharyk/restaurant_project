@@ -29,7 +29,7 @@ from decouple import config
 
 ALLOWED_HOSTS = '.onrender.com'#[config('ALLOWED_HOSTS', default='127.0.0.1')]
 
-git 
+
 # Application definition
 
 INSTALLED_APPS = [
