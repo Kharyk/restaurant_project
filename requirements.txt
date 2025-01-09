@@ -10,4 +10,5 @@ sqlparse==0.5.1
 typing_extensions==4.12.2
 unicorn==2.1.1
 whitenoise==6.8.2
-django-environ==0.11.2
+django-environ==1.0
+cloudinary==1.42.1
