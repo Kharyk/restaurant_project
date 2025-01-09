@@ -27,7 +27,8 @@ DEBUG = True
 
 from decouple import config
 
-ALLOWED_HOSTS = '.onrender.com'#[config('ALLOWED_HOSTS', default='127.0.0.1')]
+ALLOWED_HOSTS = ['.onrender.com'] 
+ALLOWED_HOSTS = [config('ALLOWED_HOSTS', default='127.0.0.1')]
 
 
 # Application definition
