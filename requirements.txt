@@ -1,5 +1,4 @@
 asgiref==3.8.1
-certifi==2024.12.14
 cloudinary==1.42.1
 Django==4.2.16
 environ==1.0
@@ -9,7 +8,6 @@ pillow==11.0.0
 pip==24.3.1
 python-decouple==3.8
 qrcode==8.0
-setuptool==66.1.1
 six==1.17.0
 sqlparse==0.5.1
 typing_extensions==4.12.2
