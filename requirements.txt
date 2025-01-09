@@ -1,7 +1,6 @@
 asgiref==3.8.1
 cloudinary==1.42.1
 Django==4.2.16
-environ==1.0
 gunicorn==23.0.0
 packaging==24.2
 pillow==11.0.0
@@ -14,3 +13,4 @@ typing_extensions==4.12.2
 unicorn==2.1.1
 urllib3==2.3.0
 whitenoise==6.8.2
+django-environ==0.11.2
