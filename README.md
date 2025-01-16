@@ -20,7 +20,8 @@ A comprehensive and user-friendly web application designed to streamline restaur
 
 ## Models
 
-![image](https://github.com/user-attachments/assets/e4d42250-71dc-4b8e-8679-163b0cb226ee)
+![image](https://github.com/user-attachments/assets/b00cbe39-558b-472a-842f-dc5e037bdcc2)
+
 
 ## Status 
 
