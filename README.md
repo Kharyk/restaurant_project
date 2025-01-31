@@ -25,4 +25,4 @@ A comprehensive and user-friendly web application designed to streamline restaur
 
 ## Status 
 
-Working on the project
+The beta version was created for educational purposes
